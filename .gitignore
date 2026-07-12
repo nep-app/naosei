@@ -1,0 +1,15 @@
+node_modules
+dist
+dist-ssr
+*.local
+.DS_Store
+*.log
+.vite
+
+# Test scaffolding (local visual checks only)
+preview.html
+preview/
+vite.preview.config.js
+shot.mjs
+nav.mjs
+nav2.mjs

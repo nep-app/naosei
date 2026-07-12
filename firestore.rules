@@ -1,0 +1,126 @@
+rules_version = '2';
+
+// ============================================================================
+// REGRAS DE SEGURANÇA FIRESTORE — projeto partilhado com a NEP App.
+//
+// Este ficheiro contém DUAS partes:
+//   (A) As regras ORIGINAIS da NEP App (dados pessoais cifrados) — mantidas tal como
+//       estavam, para NÃO partir a app existente.
+//   (B) As regras NOVAS do site "naosei" — registo pessoal privado + fórum anónimo.
+//
+// Regra de ouro (Row Level Security): cada pessoa só lê/escreve os SEUS dados.
+// O fórum é a exceção deliberada: qualquer pessoa autenticada LÊ as publicações,
+// mas só o AUTOR pode criar/apagar as suas.
+// ============================================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---- Helpers ----
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // ========================================================================
+    // (A) REGRAS ORIGINAIS DA NEP APP  — não mexer
+    // ========================================================================
+    function isValidEncryptedDoc() {
+      return request.resource.data.keys().hasAll(['data', 'iv'])
+        && request.resource.data.data is string
+        && request.resource.data.data.size() <= 1048576
+        && request.resource.data.iv is string
+        && request.resource.data.iv.size() <= 256;
+    }
+    function isSyncedCollection(collectionId) {
+      return collectionId in [
+        'consumptions', 'dailyLogs', 'reflections',
+        'wellbeingLogs', 'cycles', 'goals', 'thoughts'
+      ];
+    }
+
+    match /users/{userId}/{collectionId}/{docId} {
+      allow read, delete: if isOwner(userId);
+      allow create, update: if isOwner(userId)
+        && isSyncedCollection(collectionId)
+        && isValidEncryptedDoc();
+    }
+    match /users/{userId}/settings/{docId} {
+      allow read, write: if isOwner(userId);
+    }
+    match /users/{userId}/_system/{docId} {
+      allow read, write: if isOwner(userId);
+    }
+    match /users/{userId}/push/{docId} {
+      allow read, write: if isOwner(userId);
+    }
+    match /research/{anonId}/{document=**} {
+      allow read: if false;
+      allow write: if request.auth != null
+        && request.resource.data.anonId == anonId;
+    }
+
+    // ========================================================================
+    // (B) REGRAS NOVAS — site "naosei"
+    // ========================================================================
+
+    // ---- Registo pessoal (PRIVADO do dono) ----
+    // naosei_users/{uid}/entries/*  — só o dono lê e escreve.
+    match /naosei_users/{userId}/{collectionId}/{docId} {
+      allow read, write: if isOwner(userId);
+    }
+
+    // ---- Perfil do fórum (alcunha) ----
+    // naosei_profiles/{uid} — cada pessoa gere o seu; leitura autorizada a quem tem sessão
+    // (só contém a alcunha pública, nunca o email/nome real).
+    match /naosei_profiles/{userId} {
+      allow read: if isSignedIn();
+      allow write: if isOwner(userId)
+        && request.resource.data.alias is string
+        && request.resource.data.alias.size() <= 24;
+    }
+
+    // ---- Publicações do fórum (PARTILHADAS, anónimas) ----
+    // Leitura: qualquer pessoa autenticada. Criar: só como próprio autor.
+    // Apagar/editar: só o autor.
+    match /naosei_forum_posts/{postId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn()
+        && request.resource.data.authorUid == request.auth.uid
+        && request.resource.data.title is string
+        && request.resource.data.title.size() <= 140
+        && request.resource.data.body is string
+        && request.resource.data.body.size() <= 5000;
+      allow delete: if isSignedIn() && resource.data.authorUid == request.auth.uid;
+      allow update: if false;
+
+      // Respostas (anónimas). Leitura: autenticados. Criar: só como próprio autor.
+      match /replies/{replyId} {
+        allow read: if isSignedIn();
+        allow create: if isSignedIn()
+          && request.resource.data.authorUid == request.auth.uid
+          && request.resource.data.body is string
+          && request.resource.data.body.size() <= 3000;
+        allow delete: if isSignedIn() && resource.data.authorUid == request.auth.uid;
+        allow update: if false;
+      }
+    }
+
+    // ---- Votos de "apoio" (positivos) ----
+    // naosei_forum_votes/{postId__uid}. Um por pessoa por publicação.
+    // Cada pessoa só cria/apaga o SEU voto.
+    match /naosei_forum_votes/{voteId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.uid == request.auth.uid;
+      allow update: if false;
+    }
+
+    // ---- Negar tudo o resto ----
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

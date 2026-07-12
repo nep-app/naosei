@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>NEP — Comunidade & Registo</title>
+    <meta name="description" content="Versão web da NEP: registo pessoal privado e fórum anónimo de apoio.">
+    <script>
+        // Modo escuro sempre (igual à app original)
+        document.documentElement.classList.add('dark');
+    </script>
+    <style>
+        html { overflow-x: hidden; }
+        body { margin: 0; padding: 0; overflow-x: hidden; max-width: 100vw; }
+        .dark { background-color: #1a1a1a; color: #e5e5e5; }
+        .dark .bg-white { background-color: #2d2d2d !important; }
+        .dark .text-gray-800 { color: #e5e5e5 !important; }
+        .dark .text-gray-700 { color: #d1d1d1 !important; }
+        .dark .text-gray-600 { color: #b0b0b0 !important; }
+        .dark .text-gray-500 { color: #909090 !important; }
+        .dark .border-gray-200 { border-color: #404040 !important; }
+        .dark .bg-gray-50 { background-color: #252525 !important; }
+        .dark .bg-gray-100 { background-color: #333333 !important; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+</body>
+</html>
