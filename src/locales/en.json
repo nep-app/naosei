@@ -10,7 +10,7 @@
     "settings": "Account"
   },
   "login": {
-    "subtitle": "Sign in to your private space and the community",
+    "subtitle": "Sign in to the anonymous support community",
     "emailLabel": "Email",
     "emailPlaceholder": "you@email.com",
     "passwordLabel": "Password",
@@ -131,7 +131,7 @@
     "language": "Language",
     "signOut": "Sign out",
     "privacyTitle": "Your privacy",
-    "privacyText": "Your journal is private — only you can see it. In the forum you always appear as your alias, never your email or real name.",
+    "privacyText": "In the forum you always appear as your alias, never your email or real name. Nobody can link the messages back to you.",
     "copyright": "NEP · Harm reduction, no judgement."
   },
   "common": {

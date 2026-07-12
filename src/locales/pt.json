@@ -10,7 +10,7 @@
     "settings": "Conta"
   },
   "login": {
-    "subtitle": "Entra para o teu espaço privado e para a comunidade",
+    "subtitle": "Entra na comunidade anónima de apoio",
     "emailLabel": "Email",
     "emailPlaceholder": "o.teu@email.com",
     "passwordLabel": "Palavra-passe",
@@ -131,7 +131,7 @@
     "language": "Língua",
     "signOut": "Terminar sessão",
     "privacyTitle": "A tua privacidade",
-    "privacyText": "O teu diário é privado — só tu o vês. No fórum apareces sempre com a tua alcunha, nunca com o teu email ou nome real.",
+    "privacyText": "No fórum apareces sempre com a tua alcunha, nunca com o teu email ou nome real. Ninguém consegue ligar as mensagens a ti.",
     "copyright": "NEP · Redução de danos, sem julgamento."
   },
   "common": {

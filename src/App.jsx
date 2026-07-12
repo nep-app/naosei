@@ -3,8 +3,6 @@ import { useTranslation } from 'react-i18next';
 import * as Icons from './Icons';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LoginScreen } from './components/LoginScreen';
-import { HomeView } from './views/HomeView';
-import { HistoryView } from './views/HistoryView';
 import { ForumView } from './views/ForumView';
 import { SettingsView } from './views/SettingsView';
 
@@ -30,7 +28,7 @@ function Toasts({ toasts }) {
 function Shell() {
   const { t } = useTranslation();
   const { user, loading } = useAuth();
-  const [view, setView] = useState('home');
+  const [view, setView] = useState('forum');
   const [toasts, setToasts] = useState([]);
 
   const showToast = (message, type = 'success') => {
@@ -50,8 +48,6 @@ function Shell() {
   if (!user) return <LoginScreen />;
 
   const navItems = [
-    { key: 'home', icon: Icons.Heart, label: t('nav.home') },
-    { key: 'history', icon: Icons.BookOpen, label: t('nav.history') },
     { key: 'forum', icon: Icons.MessageSquare, label: t('nav.forum') },
     { key: 'settings', icon: Icons.User, label: t('nav.settings') },
   ];
@@ -59,8 +55,6 @@ function Shell() {
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100 pb-24">
       <div className="max-w-2xl mx-auto px-4 pt-6">
-        {view === 'home' && <HomeView showToast={showToast} goTo={setView} />}
-        {view === 'history' && <HistoryView showToast={showToast} />}
         {view === 'forum' && <ForumView showToast={showToast} />}
         {view === 'settings' && <SettingsView showToast={showToast} />}
       </div>
@@ -71,7 +65,7 @@ function Shell() {
         style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}
       >
         <div className="max-w-2xl mx-auto">
-          <div className="grid grid-cols-4 gap-1">
+          <div className="grid grid-cols-2 gap-2">
             {navItems.map(({ key, icon: Icon, label }) => (
               <button
                 key={key}
