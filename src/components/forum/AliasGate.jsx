@@ -37,12 +37,23 @@ export function AliasGate() {
         placeholder={t('forum.aliasPlaceholder')}
         className="w-full px-4 py-3 bg-gray-800 border-2 border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent mb-4"
       />
+      <div className="bg-gray-800/60 border border-gray-700 rounded-xl p-4 mb-4 text-left">
+        <div className="text-sm font-semibold text-white mb-2">{t('safety.rulesTitle')}</div>
+        <ul className="space-y-1.5 text-xs text-gray-300">
+          {['rule1', 'rule2', 'rule3', 'rule4', 'rule5'].map((k) => (
+            <li key={k} className="flex gap-2">
+              <span className="text-purple-400">•</span><span>{t(`safety.${k}`)}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
       <button
         onClick={submit}
         disabled={saving || !value.trim()}
         className="w-full py-3 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 text-white font-medium hover:from-purple-600 hover:to-blue-600 transition-all disabled:opacity-50"
       >
-        {t('forum.aliasSave')}
+        {t('safety.agree')} · {t('forum.aliasSave')}
       </button>
     </div>
   );

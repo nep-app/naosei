@@ -23,6 +23,11 @@ service cloud.firestore {
     function isSignedIn() {
       return request.auth != null;
     }
+    // Moderador = tem um documento em naosei_moderators/{uid} (criado na consola Firebase).
+    function isModerator() {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/naosei_moderators/$(request.auth.uid));
+    }
 
     // ========================================================================
     // (A) REGRAS ORIGINAIS DA NEP APP  — não mexer
@@ -93,7 +98,9 @@ service cloud.firestore {
         && request.resource.data.title.size() <= 140
         && request.resource.data.body is string
         && request.resource.data.body.size() <= 5000;
-      allow delete: if isSignedIn() && resource.data.authorUid == request.auth.uid;
+      // Apagar: o autor OU um moderador.
+      allow delete: if isSignedIn()
+        && (resource.data.authorUid == request.auth.uid || isModerator());
       allow update: if false;
 
       // Respostas (anónimas). Leitura: autenticados. Criar: só como próprio autor.
@@ -103,9 +110,27 @@ service cloud.firestore {
           && request.resource.data.authorUid == request.auth.uid
           && request.resource.data.body is string
           && request.resource.data.body.size() <= 3000;
-        allow delete: if isSignedIn() && resource.data.authorUid == request.auth.uid;
+        // Apagar: o autor OU um moderador.
+        allow delete: if isSignedIn()
+          && (resource.data.authorUid == request.auth.uid || isModerator());
         allow update: if false;
       }
+    }
+
+    // ---- Denúncias ----
+    // Qualquer pessoa autenticada pode CRIAR uma denúncia (como próprio autor).
+    // Ler/gerir: só moderadores.
+    match /naosei_forum_reports/{reportId} {
+      allow create: if isSignedIn() && request.resource.data.reporterUid == request.auth.uid;
+      allow read, update, delete: if isModerator();
+    }
+
+    // ---- Lista de moderadores ----
+    // naosei_moderators/{uid}. Leitura permitida a autenticados (para a app saber
+    // quem pode moderar); escrita só pela consola/admin.
+    match /naosei_moderators/{uid} {
+      allow read: if isSignedIn();
+      allow write: if false;
     }
 
     // ---- Votos de "apoio" (positivos) ----

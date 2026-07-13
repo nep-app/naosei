@@ -89,6 +89,20 @@ export function subscribeVotes(postId, cb) {
   return onSnapshot(q, (snap) => cb(snap.size, snap.docs.map((d) => d.id)));
 }
 
+// Denúncias: qualquer pessoa autenticada pode sinalizar uma mensagem.
+// Só os moderadores leem/gerem (ver firestore.rules).
+export function reportContent(uid, { postId, replyId = null, kind }) {
+  return addDoc(collection(db, 'naosei_forum_reports'), {
+    reporterUid: uid,
+    postId,
+    replyId,
+    kind, // 'post' | 'reply'
+    createdAt: serverTimestamp(),
+    ts: Date.now(),
+    status: 'open',
+  });
+}
+
 export async function toggleVote(postId, uid) {
   const ref = doc(db, 'naosei_forum_votes', `${postId}__${uid}`);
   const snap = await getDoc(ref);

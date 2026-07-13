@@ -6,6 +6,7 @@ import { subscribeReplies, addReply, deletePost } from '../../data';
 import { THEME_EMOJI } from '../../constants/themes';
 import { timeAgo } from '../../helpers';
 import { VoteButton } from './VoteButton';
+import { ReportButton } from './ReportButton';
 
 export function PostDetail({ post, onBack, showToast }) {
   const { t } = useTranslation();
@@ -66,6 +67,7 @@ export function PostDetail({ post, onBack, showToast }) {
         <p className="text-gray-200 mt-2 whitespace-pre-wrap">{post.body}</p>
         <div className="flex items-center gap-3 mt-4">
           <VoteButton postId={post.id} />
+          {!isOwner && <ReportButton postId={post.id} kind="post" />}
           <span className="text-xs text-gray-500 ml-auto">— {post.alias}</span>
           {isOwner && (
             <button onClick={removePost} className="text-gray-500 hover:text-red-400 p-1">
@@ -92,6 +94,11 @@ export function PostDetail({ post, onBack, showToast }) {
                 <span className="text-xs text-gray-500">{timeAgo(r.ts, t)}</span>
               </div>
               <p className="text-sm text-gray-200 whitespace-pre-wrap">{r.body}</p>
+              {r.authorUid !== user.uid && (
+                <div className="mt-2 flex justify-end">
+                  <ReportButton postId={post.id} replyId={r.id} kind="reply" />
+                </div>
+              )}
             </div>
           ))}
         </div>

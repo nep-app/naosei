@@ -8,6 +8,7 @@ import { AliasGate } from '../components/forum/AliasGate';
 import { PostCard } from '../components/forum/PostCard';
 import { PostDetail } from '../components/forum/PostDetail';
 import { NewPostModal } from '../components/forum/NewPostModal';
+import { SafetyBar } from '../components/forum/SafetyBar';
 
 export function ForumView({ showToast }) {
   const { t } = useTranslation();
@@ -47,6 +48,8 @@ export function ForumView({ showToast }) {
         </div>
         <p className="text-sm text-gray-400 mt-1">{t('forum.subtitle')}</p>
       </header>
+
+      <SafetyBar />
 
       {/* Filtro de temas */}
       <div className="flex gap-2 overflow-x-auto pb-3 mb-2 -mx-1 px-1">
