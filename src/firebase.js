@@ -1,19 +1,21 @@
 // ===== CONFIGURAÇÃO FIREBASE =====
-// Mesmo projeto Firebase da NEP App, para que a CONTA seja a mesma nos dois sítios.
+// Projeto Firebase PRÓPRIO do fórum "naosei" (naosei-7faff), separado da NEP App.
+// Assim o fórum público fica completamente isolado dos dados privados da app.
 // Estas chaves são públicas (normal em apps de navegador). A proteção real vem das
-// Firestore Security Rules (ficheiro firestore.rules) — cada pessoa só vê os seus dados.
+// Firestore Security Rules (ficheiro firestore.rules).
 
 import { initializeApp, getApps } from 'firebase/app';
 import { getAuth, GoogleAuthProvider } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 export const firebaseConfig = {
-  apiKey: "AIzaSyDH8-OZZQPHzWOnkcABi0tWbeFpxSrnc0w",
-  authDomain: "harm-reduction-d4f7d.firebaseapp.com",
-  projectId: "harm-reduction-d4f7d",
-  storageBucket: "harm-reduction-d4f7d.firebasestorage.app",
-  messagingSenderId: "732077932839",
-  appId: "1:732077932839:web:894f098ab346d79e462902"
+  apiKey: "AIzaSyDtMZv3zvXE14Mu3HxCKxH7naZ5v3V4TY4",
+  authDomain: "naosei-7faff.firebaseapp.com",
+  projectId: "naosei-7faff",
+  storageBucket: "naosei-7faff.firebasestorage.app",
+  messagingSenderId: "587858880147",
+  appId: "1:587858880147:web:c63e2e35cc37585a5ccf66",
+  measurementId: "G-VCV6CKZZ03"
 };
 
 export function getFirebaseApp() {

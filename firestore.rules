@@ -1,27 +1,22 @@
 rules_version = '2';
 
 // ============================================================================
-// REGRAS DE SEGURANÇA FIRESTORE — projeto partilhado com a NEP App.
+// REGRAS DE SEGURANÇA FIRESTORE — projeto PRÓPRIO do fórum "naosei".
+// Projeto separado da NEP App: aqui só vive o fórum anónimo (e nada da app).
 //
-// Este ficheiro contém DUAS partes:
-//   (A) As regras ORIGINAIS da NEP App (dados pessoais cifrados) — mantidas tal como
-//       estavam, para NÃO partir a app existente.
-//   (B) As regras NOVAS do site "naosei" — registo pessoal privado + fórum anónimo.
-//
-// Regra de ouro (Row Level Security): cada pessoa só lê/escreve os SEUS dados.
-// O fórum é a exceção deliberada: qualquer pessoa autenticada LÊ as publicações,
-// mas só o AUTOR pode criar/apagar as suas.
+// Regra base: só quem tem sessão iniciada participa. As publicações são LIDAS por
+// qualquer pessoa autenticada (é um fórum), mas cada um só cria/apaga o que é seu.
 // ============================================================================
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
     // ---- Helpers ----
-    function isOwner(userId) {
-      return request.auth != null && request.auth.uid == userId;
-    }
     function isSignedIn() {
       return request.auth != null;
+    }
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
     }
     // Moderador = tem um documento em naosei_moderators/{uid} (criado na consola Firebase).
     function isModerator() {
@@ -29,56 +24,8 @@ service cloud.firestore {
         && exists(/databases/$(database)/documents/naosei_moderators/$(request.auth.uid));
     }
 
-    // ========================================================================
-    // (A) REGRAS ORIGINAIS DA NEP APP  — não mexer
-    // ========================================================================
-    function isValidEncryptedDoc() {
-      return request.resource.data.keys().hasAll(['data', 'iv'])
-        && request.resource.data.data is string
-        && request.resource.data.data.size() <= 1048576
-        && request.resource.data.iv is string
-        && request.resource.data.iv.size() <= 256;
-    }
-    function isSyncedCollection(collectionId) {
-      return collectionId in [
-        'consumptions', 'dailyLogs', 'reflections',
-        'wellbeingLogs', 'cycles', 'goals', 'thoughts'
-      ];
-    }
-
-    match /users/{userId}/{collectionId}/{docId} {
-      allow read, delete: if isOwner(userId);
-      allow create, update: if isOwner(userId)
-        && isSyncedCollection(collectionId)
-        && isValidEncryptedDoc();
-    }
-    match /users/{userId}/settings/{docId} {
-      allow read, write: if isOwner(userId);
-    }
-    match /users/{userId}/_system/{docId} {
-      allow read, write: if isOwner(userId);
-    }
-    match /users/{userId}/push/{docId} {
-      allow read, write: if isOwner(userId);
-    }
-    match /research/{anonId}/{document=**} {
-      allow read: if false;
-      allow write: if request.auth != null
-        && request.resource.data.anonId == anonId;
-    }
-
-    // ========================================================================
-    // (B) REGRAS NOVAS — site "naosei"
-    // ========================================================================
-
-    // ---- Registo pessoal (PRIVADO do dono) ----
-    // naosei_users/{uid}/entries/*  — só o dono lê e escreve.
-    match /naosei_users/{userId}/{collectionId}/{docId} {
-      allow read, write: if isOwner(userId);
-    }
-
     // ---- Perfil do fórum (alcunha) ----
-    // naosei_profiles/{uid} — cada pessoa gere o seu; leitura autorizada a quem tem sessão
+    // Cada pessoa gere o seu; leitura permitida a quem tem sessão
     // (só contém a alcunha pública, nunca o email/nome real).
     match /naosei_profiles/{userId} {
       allow read: if isSignedIn();
@@ -87,9 +34,13 @@ service cloud.firestore {
         && request.resource.data.alias.size() <= 24;
     }
 
+    // ---- Registo pessoal (PRIVADO do dono), caso venha a existir ----
+    match /naosei_users/{userId}/{collectionId}/{docId} {
+      allow read, write: if isOwner(userId);
+    }
+
     // ---- Publicações do fórum (PARTILHADAS, anónimas) ----
     // Leitura: qualquer pessoa autenticada. Criar: só como próprio autor.
-    // Apagar/editar: só o autor.
     match /naosei_forum_posts/{postId} {
       allow read: if isSignedIn();
       allow create: if isSignedIn()
@@ -103,14 +54,13 @@ service cloud.firestore {
         && (resource.data.authorUid == request.auth.uid || isModerator());
       allow update: if false;
 
-      // Respostas (anónimas). Leitura: autenticados. Criar: só como próprio autor.
+      // Respostas (anónimas).
       match /replies/{replyId} {
         allow read: if isSignedIn();
         allow create: if isSignedIn()
           && request.resource.data.authorUid == request.auth.uid
           && request.resource.data.body is string
           && request.resource.data.body.size() <= 3000;
-        // Apagar: o autor OU um moderador.
         allow delete: if isSignedIn()
           && (resource.data.authorUid == request.auth.uid || isModerator());
         allow update: if false;
@@ -126,16 +76,14 @@ service cloud.firestore {
     }
 
     // ---- Lista de moderadores ----
-    // naosei_moderators/{uid}. Leitura permitida a autenticados (para a app saber
-    // quem pode moderar); escrita só pela consola/admin.
+    // Leitura permitida a autenticados; escrita só pela consola/admin.
     match /naosei_moderators/{uid} {
       allow read: if isSignedIn();
       allow write: if false;
     }
 
     // ---- Votos de "apoio" (positivos) ----
-    // naosei_forum_votes/{postId__uid}. Um por pessoa por publicação.
-    // Cada pessoa só cria/apaga o SEU voto.
+    // Um por pessoa por publicação. Cada pessoa só cria/apaga o SEU voto.
     match /naosei_forum_votes/{voteId} {
       allow read: if isSignedIn();
       allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
