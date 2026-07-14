@@ -121,20 +121,22 @@
     "guidelinesText": "Este é um espaço de apoio e redução de danos. Sê respeitoso/a. Não partilhes informação que te identifique. Não é aconselhamento médico."
   },
   "themes": {
-    "reduzir": "Reduzir",
+    "reduzir": "Gerir",
     "recaidas": "Recaídas",
     "vitorias": "Vitórias",
     "apoio": "Pedir apoio",
     "duvidas": "Dúvidas",
-    "geral": "Geral"
+    "geral": "Geral",
+    "app": "Falar da app"
   },
   "themeDesc": {
-    "reduzir": "Estratégias e experiências para consumir menos ou de forma mais consciente.",
+    "reduzir": "Ferramentas e experiências para gerir o consumo à tua maneira — reduzir, espaçar, controlar.",
     "recaidas": "Quando as coisas correm menos bem — sem julgamento, só apoio.",
     "vitorias": "Conquistas, grandes ou pequenas. Celebrar o que corre bem.",
     "apoio": "Precisas de desabafar ou de uma mão? Este é o sítio.",
     "duvidas": "Perguntas sobre substâncias, efeitos, misturas e segurança.",
-    "geral": "Conversa livre sobre tudo o resto."
+    "geral": "Conversa livre sobre tudo o resto.",
+    "app": "Sugestões, dúvidas e problemas sobre a app e o site."
   },
   "safety": {
     "disclaimer": "Partilha entre pares — não é aconselhamento médico.",

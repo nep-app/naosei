@@ -121,20 +121,22 @@
     "guidelinesText": "This is a space for support and harm reduction. Be respectful. Don't share info that identifies you. This is not medical advice."
   },
   "themes": {
-    "reduzir": "Cutting down",
+    "reduzir": "Manage",
     "recaidas": "Relapses",
     "vitorias": "Wins",
     "apoio": "Asking for support",
     "duvidas": "Questions",
-    "geral": "General"
+    "geral": "General",
+    "app": "About the app"
   },
   "themeDesc": {
-    "reduzir": "Strategies and experiences for using less or more mindfully.",
+    "reduzir": "Tools and experiences to manage use your way — cut down, space out, stay in control.",
     "recaidas": "When things don't go so well — no judgement, just support.",
     "vitorias": "Wins, big or small. Celebrating what's going well.",
     "apoio": "Need to vent or a helping hand? This is the place.",
     "duvidas": "Questions about substances, effects, mixing and safety.",
-    "geral": "Free chat about everything else."
+    "geral": "Free chat about everything else.",
+    "app": "Suggestions, questions and issues about the app and the site."
   },
   "safety": {
     "disclaimer": "Peer sharing — not medical advice.",
