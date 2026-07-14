@@ -14,8 +14,8 @@ export const firebaseConfig = {
   projectId: "naosei-7faff",
   storageBucket: "naosei-7faff.firebasestorage.app",
   messagingSenderId: "587858880147",
-  appId: "1:587858880147:web:c63e2e35cc37585a5ccf66",
-  measurementId: "G-VCV6CKZZ03"
+  appId: "1:587858880147:web:a39e7eab067e1e4c5ccf66",
+  measurementId: "G-313520MNPT"
 };
 
 export function getFirebaseApp() {
