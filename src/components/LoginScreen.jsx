@@ -12,6 +12,7 @@ export function LoginScreen() {
   const [isLogin, setIsLogin] = useState(true);
   const [alias, setAlias] = useState('');
   const [password, setPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -31,6 +32,7 @@ export function LoginScreen() {
     setError('');
     if (!aliasIsValid(alias)) { setError(t('login.aliasInvalid')); return; }
     if (password.length < 8) { setError(t('login.weakPassword')); return; }
+    if (!isLogin && password !== confirm) { setError(t('login.confirmMismatch')); return; }
     setLoading(true);
     try {
       if (isLogin) await loginAlias(alias, password);
@@ -95,6 +97,22 @@ export function LoginScreen() {
           </div>
 
           {!isLogin && (
+            <div>
+              <label className="block text-sm font-medium text-purple-300 mb-2">{t('login.confirmLabel')}</label>
+              <input
+                type="password"
+                value={confirm}
+                onChange={(e) => setConfirm(e.target.value)}
+                placeholder={t('login.confirmPlaceholder')}
+                className="w-full px-4 py-3 bg-gray-800 border-2 border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                required
+                disabled={loading}
+                minLength={8}
+              />
+            </div>
+          )}
+
+          {!isLogin && (
             <p className="text-xs text-amber-300/90 bg-amber-900/20 border border-amber-700/40 rounded-lg p-3">
               {t('login.noRecovery')}
             </p>
@@ -130,7 +148,7 @@ export function LoginScreen() {
 
           <button
             type="button"
-            onClick={() => { setIsLogin(!isLogin); setError(''); }}
+            onClick={() => { setIsLogin(!isLogin); setError(''); setConfirm(''); }}
             className="w-full text-purple-400 text-sm hover:text-purple-300 transition-colors"
           >
             {isLogin ? t('login.noAccount') : t('login.hasAccount')}
