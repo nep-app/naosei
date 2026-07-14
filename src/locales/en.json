@@ -113,6 +113,18 @@
     "reported": "Thank you. It's been flagged for review.",
     "modDelete": "Delete (moderation)",
     "moderatorBadge": "Moderator",
+    "searchPlaceholder": "Search the forum…",
+    "savedFilter": "Saved",
+    "save": "Save",
+    "unsave": "Saved",
+    "noSaved": "You haven't saved any posts yet. Tap the bookmark on a post to save it.",
+    "pin": "Pin",
+    "unpin": "Unpin",
+    "pinned": "Pinned",
+    "edit": "Edit",
+    "edited": "edited",
+    "saveEdit": "Save changes",
+    "modOnlyChannel": "Only moderators can post in the Announcements channel.",
     "replyPlaceholder": "Write a reply…",
     "sendReply": "Send",
     "replies_one": "{{count}} reply",
@@ -130,6 +142,7 @@
     "guidelinesText": "This is a space for support and harm reduction. Be respectful. Don't share info that identifies you. This is not medical advice."
   },
   "themes": {
+    "avisos": "Announcements",
     "reduzir": "Manage",
     "recaidas": "Difficult moments",
     "vitorias": "Wins",
@@ -139,6 +152,7 @@
     "app": "About the app"
   },
   "themeDesc": {
+    "avisos": "Messages from the moderators: rules, news and alerts. Only moderators post here.",
     "reduzir": "Tools and experiences to manage use your way — cut down, space out, stay in control.",
     "recaidas": "When things don't go so well — no judgement, just support.",
     "vitorias": "Wins, big or small. Celebrating what's going well.",

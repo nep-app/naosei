@@ -6,7 +6,7 @@ import { THEME_EMOJI } from '../../constants/themes';
 import { timeAgo } from '../../helpers';
 import { VoteButton } from './VoteButton';
 
-export function PostCard({ post, onOpen }) {
+export function PostCard({ post, onOpen, bookmarked, onToggleBookmark }) {
   const { t } = useTranslation();
   const [replyCount, setReplyCount] = useState(0);
 
@@ -18,9 +18,17 @@ export function PostCard({ post, onOpen }) {
   return (
     <div
       onClick={() => onOpen(post)}
-      className="w-full text-left bg-gray-800 rounded-2xl p-4 border border-gray-700/50 hover:border-purple-600/50 transition-all cursor-pointer"
+      className={
+        'w-full text-left bg-gray-800 rounded-2xl p-4 border hover:border-purple-600/50 transition-all cursor-pointer ' +
+        (post.pinned ? 'border-purple-600/50' : 'border-gray-700/50')
+      }
     >
       <div className="flex items-center gap-2 mb-2 flex-wrap">
+        {post.pinned && (
+          <span className="text-xs px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 inline-flex items-center gap-1">
+            <Icons.Pin className="w-3 h-3" filled /> {t('forum.pinned')}
+          </span>
+        )}
         <span className="text-xs px-2 py-0.5 rounded-full bg-gray-700 text-gray-300">
           {THEME_EMOJI[post.theme]} {t(`themes.${post.theme}`)}
         </span>
@@ -41,6 +49,13 @@ export function PostCard({ post, onOpen }) {
           <Icons.MessageSquare className="w-3.5 h-3.5" />
           {replyCount}
         </span>
+        <button
+          onClick={(e) => { e.stopPropagation(); onToggleBookmark(post.id); }}
+          className={'p-1 rounded-md transition-colors ' + (bookmarked ? 'text-purple-300' : 'text-gray-500 hover:text-gray-300')}
+          title={bookmarked ? t('forum.unsave') : t('forum.save')}
+        >
+          <Icons.Bookmark className="w-4 h-4" filled={bookmarked} />
+        </button>
         <span className="text-xs text-gray-500 ml-auto">— {post.alias}</span>
       </div>
     </div>

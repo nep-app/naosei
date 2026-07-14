@@ -113,6 +113,18 @@
     "reported": "Obrigado. Foi sinalizado para revisão.",
     "modDelete": "Apagar (moderação)",
     "moderatorBadge": "Moderador/a",
+    "searchPlaceholder": "Pesquisar no fórum…",
+    "savedFilter": "Guardados",
+    "save": "Guardar",
+    "unsave": "Guardado",
+    "noSaved": "Ainda não guardaste nenhuma publicação. Toca no marcador numa publicação para a guardares.",
+    "pin": "Fixar",
+    "unpin": "Desafixar",
+    "pinned": "Fixado",
+    "edit": "Editar",
+    "edited": "editado",
+    "saveEdit": "Guardar alterações",
+    "modOnlyChannel": "Só os moderadores podem publicar no canal Avisos.",
     "replyPlaceholder": "Escreve uma resposta…",
     "sendReply": "Enviar",
     "replies_one": "{{count}} resposta",
@@ -130,6 +142,7 @@
     "guidelinesText": "Este é um espaço de apoio e redução de danos. Sê respeitoso/a. Não partilhes informação que te identifique. Não é aconselhamento médico."
   },
   "themes": {
+    "avisos": "Avisos",
     "reduzir": "Gerir",
     "recaidas": "Momentos difíceis",
     "vitorias": "Vitórias",
@@ -139,6 +152,7 @@
     "app": "Falar da app"
   },
   "themeDesc": {
+    "avisos": "Mensagens dos moderadores: regras, novidades e alertas. Só moderadores publicam aqui.",
     "reduzir": "Ferramentas e experiências para gerir o consumo à tua maneira — reduzir, espaçar, controlar.",
     "recaidas": "Quando as coisas correm menos bem — sem julgamento, só apoio.",
     "vitorias": "Conquistas, grandes ou pequenas. Celebrar o que corre bem.",

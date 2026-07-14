@@ -4,7 +4,7 @@
 //  - Fórum (partilhado, anónimo): naosei_forum_posts/*, replies, naosei_forum_votes/*
 
 import {
-  collection, doc, addDoc, deleteDoc, setDoc, getDoc,
+  collection, doc, addDoc, deleteDoc, setDoc, getDoc, updateDoc,
   query, where, orderBy, onSnapshot, serverTimestamp,
 } from 'firebase/firestore';
 import { db } from './firebase';
@@ -60,6 +60,33 @@ export function addPost(uid, alias, { theme, title, body, isQuestion }) {
 
 export function deletePost(id) {
   return deleteDoc(doc(db, 'naosei_forum_posts', id));
+}
+
+// Editar a própria publicação (título/corpo).
+export function updatePost(id, { title, body }) {
+  return updateDoc(doc(db, 'naosei_forum_posts', id), {
+    title: title.trim().slice(0, 140),
+    body: body.trim().slice(0, 5000),
+    editedAt: Date.now(),
+  });
+}
+
+// Fixar/desafixar (moderadores).
+export function setPostPinned(id, pinned) {
+  return updateDoc(doc(db, 'naosei_forum_posts', id), { pinned: !!pinned });
+}
+
+// ---------- Guardados (favoritos) — privado do dono ----------
+export function subscribeBookmarks(uid, cb) {
+  return onSnapshot(collection(db, 'naosei_users', uid, 'bookmarks'), (snap) => {
+    cb(snap.docs.map((d) => d.id));
+  });
+}
+export function addBookmark(uid, postId) {
+  return setDoc(doc(db, 'naosei_users', uid, 'bookmarks', postId), { ts: Date.now() });
+}
+export function removeBookmark(uid, postId) {
+  return deleteDoc(doc(db, 'naosei_users', uid, 'bookmarks', postId));
 }
 
 export function subscribeReplies(postId, cb) {

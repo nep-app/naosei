@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as Icons from '../../Icons';
 import { useAuth } from '../../contexts/AuthContext';
-import { subscribeReplies, addReply, deletePost, deleteReply } from '../../data';
+import { subscribeReplies, addReply, deletePost, deleteReply, updatePost, setPostPinned } from '../../data';
 import { THEME_EMOJI } from '../../constants/themes';
 import { timeAgo } from '../../helpers';
 import { VoteButton } from './VoteButton';
@@ -14,6 +14,27 @@ export function PostDetail({ post, onBack, showToast }) {
   const [replies, setReplies] = useState([]);
   const [text, setText] = useState('');
   const [sending, setSending] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [editTitle, setEditTitle] = useState(post.title);
+  const [editBody, setEditBody] = useState(post.body);
+
+  const saveEdit = async () => {
+    if (!editTitle.trim() || !editBody.trim()) return;
+    try {
+      await updatePost(post.id, { title: editTitle, body: editBody });
+      setEditing(false);
+    } catch {
+      showToast(t('common.error'), 'error');
+    }
+  };
+
+  const togglePin = async () => {
+    try {
+      await setPostPinned(post.id, !post.pinned);
+    } catch {
+      showToast(t('common.error'), 'error');
+    }
+  };
 
   useEffect(() => {
     const unsub = subscribeReplies(post.id, setReplies);
@@ -62,6 +83,11 @@ export function PostDetail({ post, onBack, showToast }) {
 
       <div className="bg-gray-800 rounded-2xl p-5 border border-gray-700/50">
         <div className="flex items-center gap-2 mb-3 flex-wrap">
+          {post.pinned && (
+            <span className="text-xs px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 inline-flex items-center gap-1">
+              <Icons.Pin className="w-3 h-3" filled /> {t('forum.pinned')}
+            </span>
+          )}
           <span className="text-xs px-2 py-0.5 rounded-full bg-gray-700 text-gray-300">
             {THEME_EMOJI[post.theme]} {t(`themes.${post.theme}`)}
           </span>
@@ -72,18 +98,60 @@ export function PostDetail({ post, onBack, showToast }) {
           )}
           <span className="text-xs text-gray-500 ml-auto">{timeAgo(post.ts, t)}</span>
         </div>
-        <h2 className="text-xl font-bold text-white">{post.title}</h2>
-        <p className="text-gray-200 mt-2 whitespace-pre-wrap">{post.body}</p>
-        <div className="flex items-center gap-3 mt-4">
-          <VoteButton postId={post.id} />
-          {!isOwner && <ReportButton postId={post.id} kind="post" />}
-          <span className="text-xs text-gray-500 ml-auto">— {post.alias}</span>
-          {(isOwner || isModerator) && (
-            <button onClick={removePost} title={isModerator && !isOwner ? t('forum.modDelete') : t('common.delete')} className="text-gray-500 hover:text-red-400 p-1">
-              <Icons.Trash2 className="w-4 h-4" />
-            </button>
-          )}
-        </div>
+        {editing ? (
+          <div className="mt-2 space-y-2">
+            <input
+              value={editTitle}
+              onChange={(e) => setEditTitle(e.target.value)}
+              maxLength={140}
+              className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+            />
+            <textarea
+              value={editBody}
+              onChange={(e) => setEditBody(e.target.value)}
+              rows={5}
+              maxLength={5000}
+              className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+            />
+            <div className="flex gap-2">
+              <button onClick={() => { setEditing(false); setEditTitle(post.title); setEditBody(post.body); }} className="flex-1 py-2 rounded-lg bg-gray-700 text-gray-200 text-sm font-medium">
+                {t('forum.cancel')}
+              </button>
+              <button onClick={saveEdit} className="flex-1 py-2 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 text-white text-sm font-medium">
+                {t('forum.saveEdit')}
+              </button>
+            </div>
+          </div>
+        ) : (
+          <>
+            <h2 className="text-xl font-bold text-white">{post.title}</h2>
+            <p className="text-gray-200 mt-2 whitespace-pre-wrap">{post.body}</p>
+            {post.editedAt && <span className="text-xs text-gray-500 italic">({t('forum.edited')})</span>}
+          </>
+        )}
+
+        {!editing && (
+          <div className="flex items-center gap-3 mt-4">
+            <VoteButton postId={post.id} />
+            {!isOwner && <ReportButton postId={post.id} kind="post" />}
+            <span className="text-xs text-gray-500 ml-auto">— {post.alias}</span>
+            {isModerator && (
+              <button onClick={togglePin} title={post.pinned ? t('forum.unpin') : t('forum.pin')} className={'p-1 ' + (post.pinned ? 'text-purple-300' : 'text-gray-500 hover:text-purple-300')}>
+                <Icons.Pin className="w-4 h-4" filled={post.pinned} />
+              </button>
+            )}
+            {isOwner && (
+              <button onClick={() => setEditing(true)} title={t('forum.edit')} className="text-gray-500 hover:text-purple-300 p-1">
+                <Icons.Edit className="w-4 h-4" />
+              </button>
+            )}
+            {(isOwner || isModerator) && (
+              <button onClick={removePost} title={isModerator && !isOwner ? t('forum.modDelete') : t('common.delete')} className="text-gray-500 hover:text-red-400 p-1">
+                <Icons.Trash2 className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mt-6 mb-3">

@@ -2,10 +2,7 @@ rules_version = '2';
 
 // ============================================================================
 // REGRAS DE SEGURANÇA FIRESTORE — projeto PRÓPRIO do fórum "naosei".
-// Projeto separado da NEP App: aqui só vive o fórum anónimo (e nada da app).
-//
-// Regra base: só quem tem sessão iniciada participa. As publicações são LIDAS por
-// qualquer pessoa autenticada (é um fórum), mas cada um só cria/apaga o que é seu.
+// Projeto separado da NEP App: aqui só vive o fórum anónimo.
 // ============================================================================
 
 service cloud.firestore {
@@ -18,72 +15,76 @@ service cloud.firestore {
     function isOwner(userId) {
       return isSignedIn() && request.auth.uid == userId;
     }
-    // Moderador = tem um documento em naosei_moderators/{uid} (criado na consola Firebase).
     function isModerator() {
       return isSignedIn()
         && exists(/databases/$(database)/documents/naosei_moderators/$(request.auth.uid));
     }
 
-    // ---- Perfil do fórum (alcunha) ----
-    // Cada pessoa gere o seu; leitura permitida a quem tem sessão
-    // (só contém a alcunha pública, nunca o email/nome real).
+    // ---- Perfil (alcunha + bio + "o que te traz aqui") ----
     match /naosei_profiles/{userId} {
       allow read: if isSignedIn();
       allow write: if isOwner(userId)
         && request.resource.data.alias is string
-        && request.resource.data.alias.size() <= 24;
+        && request.resource.data.alias.size() <= 24
+        && (!('bio' in request.resource.data) || (request.resource.data.bio is string && request.resource.data.bio.size() <= 300))
+        && (!('reason' in request.resource.data) || (request.resource.data.reason is string && request.resource.data.reason.size() <= 40));
     }
 
-    // ---- Registo pessoal (PRIVADO do dono), caso venha a existir ----
+    // ---- Espaço pessoal (privado do dono): guardados, notificações, etc. ----
     match /naosei_users/{userId}/{collectionId}/{docId} {
       allow read, write: if isOwner(userId);
     }
 
-    // ---- Publicações do fórum (PARTILHADAS, anónimas) ----
-    // Leitura: qualquer pessoa autenticada. Criar: só como próprio autor.
+    // ---- Publicações do fórum ----
     match /naosei_forum_posts/{postId} {
       allow read: if isSignedIn();
+      // Criar: como próprio autor. O canal "avisos" só aceita moderadores.
       allow create: if isSignedIn()
         && request.resource.data.authorUid == request.auth.uid
         && request.resource.data.title is string
         && request.resource.data.title.size() <= 140
         && request.resource.data.body is string
-        && request.resource.data.body.size() <= 5000;
-      // Apagar: o autor OU um moderador.
+        && request.resource.data.body.size() <= 5000
+        && (request.resource.data.theme != 'avisos' || isModerator());
+      // Editar (autor) ou fixar/gerir (moderador). Título/corpo continuam limitados.
+      allow update: if isSignedIn()
+        && (resource.data.authorUid == request.auth.uid || isModerator())
+        && request.resource.data.title is string
+        && request.resource.data.title.size() <= 140
+        && request.resource.data.body is string
+        && request.resource.data.body.size() <= 5000
+        && request.resource.data.authorUid == resource.data.authorUid;
+      // Apagar: autor ou moderador.
       allow delete: if isSignedIn()
         && (resource.data.authorUid == request.auth.uid || isModerator());
-      allow update: if false;
 
-      // Respostas (anónimas).
       match /replies/{replyId} {
         allow read: if isSignedIn();
         allow create: if isSignedIn()
           && request.resource.data.authorUid == request.auth.uid
           && request.resource.data.body is string
           && request.resource.data.body.size() <= 3000;
+        allow update: if isSignedIn()
+          && resource.data.authorUid == request.auth.uid
+          && request.resource.data.authorUid == resource.data.authorUid;
         allow delete: if isSignedIn()
           && (resource.data.authorUid == request.auth.uid || isModerator());
-        allow update: if false;
       }
     }
 
     // ---- Denúncias ----
-    // Qualquer pessoa autenticada pode CRIAR uma denúncia (como próprio autor).
-    // Ler/gerir: só moderadores.
     match /naosei_forum_reports/{reportId} {
       allow create: if isSignedIn() && request.resource.data.reporterUid == request.auth.uid;
       allow read, update, delete: if isModerator();
     }
 
     // ---- Lista de moderadores ----
-    // Leitura permitida a autenticados; escrita só pela consola/admin.
     match /naosei_moderators/{uid} {
       allow read: if isSignedIn();
       allow write: if false;
     }
 
-    // ---- Votos de "apoio" (positivos) ----
-    // Um por pessoa por publicação. Cada pessoa só cria/apaga o SEU voto.
+    // ---- Votos de "apoio" ----
     match /naosei_forum_votes/{voteId} {
       allow read: if isSignedIn();
       allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;

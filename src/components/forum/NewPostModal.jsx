@@ -3,12 +3,15 @@ import { useTranslation } from 'react-i18next';
 import { Modal } from '../Modal';
 import { useAuth } from '../../contexts/AuthContext';
 import { addPost } from '../../data';
-import { FORUM_THEMES, THEME_EMOJI } from '../../constants/themes';
+import { FORUM_THEMES, THEME_EMOJI, MOD_ONLY_THEMES } from '../../constants/themes';
 
 export function NewPostModal({ onClose, showToast, defaultTheme }) {
   const { t } = useTranslation();
-  const { user, alias } = useAuth();
-  const [theme, setTheme] = useState(defaultTheme && defaultTheme !== 'all' ? defaultTheme : 'geral');
+  const { user, alias, isModerator } = useAuth();
+  // Canais que a pessoa pode usar para publicar (Avisos só para moderadores).
+  const allowedThemes = FORUM_THEMES.filter((th) => isModerator || !MOD_ONLY_THEMES.includes(th));
+  const initialTheme = defaultTheme && allowedThemes.includes(defaultTheme) ? defaultTheme : 'geral';
+  const [theme, setTheme] = useState(initialTheme);
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [isQuestion, setIsQuestion] = useState(false);
@@ -33,7 +36,7 @@ export function NewPostModal({ onClose, showToast, defaultTheme }) {
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">{t('forum.postThemeLabel')}</label>
           <div className="flex flex-wrap gap-2">
-            {FORUM_THEMES.map((th) => (
+            {allowedThemes.map((th) => (
               <button
                 key={th}
                 onClick={() => setTheme(th)}

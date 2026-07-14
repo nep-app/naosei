@@ -278,6 +278,19 @@ export const Users = ({ className = "w-5 h-5" }) => (
 );
 
 // Logótipo Google (multicolor) para o botão "Entrar com Google"
+export const Bookmark = ({ className = "w-5 h-5", filled = false }) => (
+  <svg className={className} viewBox="0 0 24 24" fill={filled ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+  </svg>
+);
+
+export const Pin = ({ className = "w-5 h-5", filled = false }) => (
+  <svg className={className} viewBox="0 0 24 24" fill={filled ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="12" y1="17" x2="12" y2="22"/>
+    <path d="M9 2h6l-1 7 3 3v2H7v-2l3-3z"/>
+  </svg>
+);
+
 export const GoogleLogo = ({ className = "w-5 h-5" }) => (
   <svg className={className} viewBox="0 0 48 48">
     <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/>
