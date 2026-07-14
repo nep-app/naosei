@@ -1,28 +1,26 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as Icons from '../Icons';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth, aliasIsValid } from '../contexts/AuthContext';
 
 export function LoginScreen() {
   const { t, i18n } = useTranslation();
-  const { loginEmail, signupEmail, loginGoogle, resetPassword } = useAuth();
+  const { loginAlias, signupAlias } = useAuth();
 
   const changeLang = (lang) => { i18n.changeLanguage(lang); localStorage.setItem('nep_lang', lang); };
 
   const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState('');
+  const [alias, setAlias] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [resetSent, setResetSent] = useState(false);
 
   const mapError = (err) => {
     switch (err.code) {
       case 'auth/wrong-password': return t('login.errWrongPassword');
       case 'auth/user-not-found': return t('login.errUserNotFound');
-      case 'auth/email-already-in-use': return t('login.errEmailInUse');
+      case 'auth/email-already-in-use': return t('login.errAliasTaken');
       case 'auth/invalid-credential': return t('login.errInvalidCred');
-      case 'auth/invalid-email': return t('login.errInvalidEmail');
       case 'auth/weak-password': return t('login.weakPassword');
       default: return t('common.error') + ': ' + err.message;
     }
@@ -31,40 +29,16 @@ export function LoginScreen() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    if (!isLogin && password.length < 12) { setError(t('login.weakPassword')); return; }
+    if (!aliasIsValid(alias)) { setError(t('login.aliasInvalid')); return; }
+    if (password.length < 8) { setError(t('login.weakPassword')); return; }
     setLoading(true);
     try {
-      if (isLogin) await loginEmail(email, password);
-      else await signupEmail(email, password);
+      if (isLogin) await loginAlias(alias, password);
+      else await signupAlias(alias, password);
     } catch (err) {
       setError(mapError(err));
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleGoogle = async () => {
-    setError('');
-    setLoading(true);
-    try {
-      await loginGoogle();
-    } catch (err) {
-      if (err.code !== 'auth/popup-closed-by-user' && err.code !== 'auth/cancelled-popup-request') {
-        setError(mapError(err));
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleReset = async () => {
-    if (!email) { setError(t('login.errNoEmail')); return; }
-    setError('');
-    try {
-      await resetPassword(email);
-      setResetSent(true);
-    } catch (err) {
-      setError(mapError(err));
     }
   };
 
@@ -90,32 +64,17 @@ export function LoginScreen() {
           <p className="text-gray-400 text-xs mt-1">{t('login.subtitle')}</p>
         </div>
 
-        {/* Botão Google */}
-        <button
-          type="button"
-          onClick={handleGoogle}
-          disabled={loading}
-          className="w-full py-3 mb-5 rounded-lg bg-white text-gray-800 font-medium flex items-center justify-center gap-3 hover:bg-gray-100 transition-all disabled:opacity-60"
-        >
-          <Icons.GoogleLogo className="w-5 h-5" />
-          {t('login.google')}
-        </button>
-
-        <div className="flex items-center gap-3 mb-5">
-          <div className="flex-1 h-px bg-gray-700" />
-          <span className="text-xs text-gray-500">{t('login.or')}</span>
-          <div className="flex-1 h-px bg-gray-700" />
-        </div>
-
-        {/* Formulário email/password */}
+        {/* Formulário alcunha + palavra-passe */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-purple-300 mb-2">{t('login.emailLabel')}</label>
+            <label className="block text-sm font-medium text-purple-300 mb-2">{t('login.aliasLabel')}</label>
             <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder={t('login.emailPlaceholder')}
+              type="text"
+              value={alias}
+              onChange={(e) => setAlias(e.target.value)}
+              placeholder={t('login.aliasPlaceholder')}
+              maxLength={24}
+              autoComplete="off"
               className="w-full px-4 py-3 bg-gray-800 border-2 border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               required
               disabled={loading}
@@ -131,23 +90,16 @@ export function LoginScreen() {
               className="w-full px-4 py-3 bg-gray-800 border-2 border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               required
               disabled={loading}
-              minLength={isLogin ? 6 : 12}
+              minLength={8}
             />
           </div>
 
-          {isLogin && (
-            <div className="text-right -mt-2">
-              <button type="button" onClick={handleReset} className="text-xs text-purple-400 hover:text-purple-300 transition-colors">
-                {t('login.forgot')}
-              </button>
-            </div>
+          {!isLogin && (
+            <p className="text-xs text-amber-300/90 bg-amber-900/20 border border-amber-700/40 rounded-lg p-3">
+              {t('login.noRecovery')}
+            </p>
           )}
 
-          {resetSent && (
-            <div className="p-3 bg-green-900/30 border border-green-700/50 rounded-lg text-green-300 text-sm">
-              {t('login.resetSent')}
-            </div>
-          )}
           {error && (
             <div className="p-3 bg-red-900/30 border border-red-700/50 rounded-lg text-red-300 text-sm">
               {error}
@@ -185,11 +137,11 @@ export function LoginScreen() {
           </button>
         </form>
 
-        {/* Nota conta partilhada */}
+        {/* Nota anonimato */}
         <div className="mt-6 bg-purple-900/20 border border-purple-700/50 rounded-lg p-4">
           <div className="flex items-start gap-2">
-            <Icons.Info className="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" />
-            <p className="text-xs text-purple-300">{t('login.sameAccount')}</p>
+            <Icons.Shield className="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" />
+            <p className="text-xs text-purple-300">{t('login.anonNote')}</p>
           </div>
         </div>
       </div>

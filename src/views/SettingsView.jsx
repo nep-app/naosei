@@ -1,22 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import * as Icons from '../Icons';
 import { useAuth } from '../contexts/AuthContext';
 
-export function SettingsView({ showToast }) {
+export function SettingsView() {
   const { t, i18n } = useTranslation();
-  const { user, alias, logout, saveAlias } = useAuth();
-  const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState(alias || '');
+  const { alias, logout } = useAuth();
 
   const changeLang = (lang) => { i18n.changeLanguage(lang); localStorage.setItem('nep_lang', lang); };
-
-  const commitAlias = async () => {
-    if (!draft.trim()) return;
-    await saveAlias(draft.trim());
-    setEditing(false);
-    showToast('OK', 'success');
-  };
 
   return (
     <div>
@@ -24,32 +15,8 @@ export function SettingsView({ showToast }) {
 
       <div className="space-y-4">
         <div className="bg-gray-800 rounded-2xl p-4 border border-gray-700/50">
-          <div className="text-xs text-gray-400 mb-1">{t('settings.signedInAs')}</div>
-          <div className="text-white font-medium break-all">{user?.email || '—'}</div>
-        </div>
-
-        <div className="bg-gray-800 rounded-2xl p-4 border border-gray-700/50">
-          <div className="text-xs text-gray-400 mb-2">{t('settings.aliasInForum')}</div>
-          {editing ? (
-            <div className="flex gap-2">
-              <input
-                value={draft}
-                onChange={(e) => setDraft(e.target.value)}
-                maxLength={24}
-                className="flex-1 px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-              />
-              <button onClick={commitAlias} className="px-4 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 text-white font-medium">
-                <Icons.Check className="w-5 h-5" />
-              </button>
-            </div>
-          ) : (
-            <div className="flex items-center justify-between">
-              <div className="text-white font-medium">{alias || '—'}</div>
-              <button onClick={() => { setDraft(alias || ''); setEditing(true); }} className="text-purple-400 text-sm hover:text-purple-300">
-                {t('forum.aliasChange')}
-              </button>
-            </div>
-          )}
+          <div className="text-xs text-gray-400 mb-1">{t('settings.aliasInForum')}</div>
+          <div className="text-white font-medium break-all">{alias || '—'}</div>
         </div>
 
         <div className="bg-gray-800 rounded-2xl p-4 border border-gray-700/50">

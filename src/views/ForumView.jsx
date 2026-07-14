@@ -4,7 +4,6 @@ import * as Icons from '../Icons';
 import { useAuth } from '../contexts/AuthContext';
 import { subscribePosts } from '../data';
 import { FORUM_THEMES, THEME_EMOJI } from '../constants/themes';
-import { AliasGate } from '../components/forum/AliasGate';
 import { PostCard } from '../components/forum/PostCard';
 import { PostDetail } from '../components/forum/PostDetail';
 import { NewPostModal } from '../components/forum/NewPostModal';
@@ -24,8 +23,14 @@ export function ForumView({ showToast }) {
     return unsub;
   }, [theme, alias]);
 
-  // Sem alcunha ainda → escolher primeiro.
-  if (!alias) return <AliasGate />;
+  // Enquanto a alcunha carrega (logo após entrar).
+  if (!alias) {
+    return (
+      <div className="flex items-center justify-center py-20 text-gray-400">
+        <Icons.RefreshCw className="w-5 h-5 animate-spin mr-2" /> {t('common.loading')}
+      </div>
+    );
+  }
 
   // A ver uma publicação em detalhe.
   if (openPost) {

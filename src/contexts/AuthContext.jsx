@@ -3,26 +3,44 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  signInWithPopup,
-  sendPasswordResetEmail,
   signOut,
 } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { auth, db, googleProvider } from '../firebase';
+import { auth, db } from '../firebase';
 
 const AuthContext = createContext(null);
 export const useAuth = () => useContext(AuthContext);
 
+// Entrada só com ALCUNHA + palavra-passe (sem email, sem Google).
+// Truque: o Firebase precisa de um "email" interno, por isso transformamos a
+// alcunha num identificador técnico (alcunha normalizada + domínio fixo). A pessoa
+// NUNCA escreve nem vê um email — só a alcunha. Esse identificador nunca aparece
+// no fórum.
+const HANDLE_DOMAIN = 'users.nepforum.app';
+
+export function aliasToHandle(alias) {
+  const norm = String(alias)
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '.')
+    .replace(/^\.+|\.+$/g, '');
+  return `${norm}@${HANDLE_DOMAIN}`;
+}
+
+export function aliasIsValid(alias) {
+  const norm = String(alias).trim().toLowerCase().replace(/[^a-z0-9]+/g, '');
+  return norm.length >= 2;
+}
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [alias, setAlias] = useState(null); // alcunha do fórum
+  const [alias, setAlias] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (u) => {
       setUser(u);
       if (u) {
-        // Vai buscar a alcunha guardada (perfil público do fórum) — se existir.
         try {
           const snap = await getDoc(doc(db, 'naosei_profiles', u.uid));
           setAlias(snap.exists() ? snap.data().alias || null : null);
@@ -37,24 +55,23 @@ export function AuthProvider({ children }) {
     return unsub;
   }, []);
 
-  const loginEmail = (email, password) => signInWithEmailAndPassword(auth, email, password);
-  const signupEmail = (email, password) => createUserWithEmailAndPassword(auth, email, password);
-  const loginGoogle = () => signInWithPopup(auth, googleProvider);
-  const resetPassword = (email) => sendPasswordResetEmail(auth, email);
-  const logout = () => signOut(auth);
-
-  // Guarda a alcunha escolhida no perfil público (naosei_profiles/{uid}).
-  const saveAlias = async (newAlias) => {
-    if (!user) return;
-    const clean = String(newAlias).trim().slice(0, 24);
-    await setDoc(doc(db, 'naosei_profiles', user.uid), { alias: clean }, { merge: true });
-    setAlias(clean);
+  // Criar conta: alcunha (nome no fórum) + palavra-passe.
+  const signupAlias = async (aliasInput, password) => {
+    const cleanAlias = String(aliasInput).trim().slice(0, 24);
+    const cred = await createUserWithEmailAndPassword(auth, aliasToHandle(cleanAlias), password);
+    await setDoc(doc(db, 'naosei_profiles', cred.user.uid), { alias: cleanAlias }, { merge: true });
+    setAlias(cleanAlias);
+    return cred;
   };
 
+  // Entrar: mesma alcunha + palavra-passe.
+  const loginAlias = (aliasInput, password) =>
+    signInWithEmailAndPassword(auth, aliasToHandle(aliasInput), password);
+
+  const logout = () => signOut(auth);
+
   return (
-    <AuthContext.Provider
-      value={{ user, alias, loading, loginEmail, signupEmail, loginGoogle, resetPassword, logout, saveAlias }}
-    >
+    <AuthContext.Provider value={{ user, alias, loading, signupAlias, loginAlias, logout }}>
       {children}
     </AuthContext.Provider>
   );
