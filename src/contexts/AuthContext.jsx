@@ -3,6 +3,7 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
   signOut,
 } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
@@ -64,23 +65,39 @@ export function AuthProvider({ children }) {
     return unsub;
   }, []);
 
-  // Criar conta: alcunha (nome no fórum) + palavra-passe.
-  const signupAlias = async (aliasInput, password) => {
+  // Criar conta: alcunha (nome no fórum) + palavra-passe + EMAIL OPCIONAL.
+  // Se der um email: a conta usa esse email real (permite recuperar a senha) e a
+  //   pessoa entra com o email. O email fica privado, nunca aparece no fórum.
+  // Se não der email: a conta usa um identificador técnico feito da alcunha e a
+  //   pessoa entra com a alcunha (sem recuperação de senha).
+  const signupAlias = async (aliasInput, password, email) => {
     const cleanAlias = String(aliasInput).trim().slice(0, 24);
-    const cred = await createUserWithEmailAndPassword(auth, aliasToHandle(cleanAlias), password);
-    await setDoc(doc(db, 'naosei_profiles', cred.user.uid), { alias: cleanAlias }, { merge: true });
+    const realEmail = email && String(email).includes('@') ? String(email).trim() : null;
+    const loginEmail = realEmail || aliasToHandle(cleanAlias);
+    const cred = await createUserWithEmailAndPassword(auth, loginEmail, password);
+    await setDoc(
+      doc(db, 'naosei_profiles', cred.user.uid),
+      { alias: cleanAlias, hasEmail: !!realEmail },
+      { merge: true }
+    );
     setAlias(cleanAlias);
     return cred;
   };
 
-  // Entrar: mesma alcunha + palavra-passe.
-  const loginAlias = (aliasInput, password) =>
-    signInWithEmailAndPassword(auth, aliasToHandle(aliasInput), password);
+  // Entrar: aceita alcunha OU email (quem criou conta com email entra com o email).
+  const loginAlias = (identifier, password) => {
+    const id = String(identifier).trim();
+    const loginEmail = id.includes('@') ? id : aliasToHandle(id);
+    return signInWithEmailAndPassword(auth, loginEmail, password);
+  };
+
+  // Recuperar senha: só funciona para quem criou a conta com email.
+  const resetPassword = (email) => sendPasswordResetEmail(auth, String(email).trim());
 
   const logout = () => signOut(auth);
 
   return (
-    <AuthContext.Provider value={{ user, alias, isModerator, loading, signupAlias, loginAlias, logout }}>
+    <AuthContext.Provider value={{ user, alias, isModerator, loading, signupAlias, loginAlias, resetPassword, logout }}>
       {children}
     </AuthContext.Provider>
   );

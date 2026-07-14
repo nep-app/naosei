@@ -5,15 +5,17 @@ import { useAuth, aliasIsValid } from '../contexts/AuthContext';
 
 export function LoginScreen() {
   const { t, i18n } = useTranslation();
-  const { loginAlias, signupAlias } = useAuth();
+  const { loginAlias, signupAlias, resetPassword } = useAuth();
 
   const changeLang = (lang) => { i18n.changeLanguage(lang); localStorage.setItem('nep_lang', lang); };
 
   const [isLogin, setIsLogin] = useState(true);
-  const [alias, setAlias] = useState('');
+  const [identifier, setIdentifier] = useState(''); // alcunha (ou email no login)
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
+  const [email, setEmail] = useState(''); // opcional, só no registo
   const [error, setError] = useState('');
+  const [info, setInfo] = useState('');
   const [loading, setLoading] = useState(false);
 
   const mapError = (err) => {
@@ -22,6 +24,7 @@ export function LoginScreen() {
       case 'auth/user-not-found': return t('login.errUserNotFound');
       case 'auth/email-already-in-use': return t('login.errAliasTaken');
       case 'auth/invalid-credential': return t('login.errInvalidCred');
+      case 'auth/invalid-email': return t('login.errInvalidCred');
       case 'auth/weak-password': return t('login.weakPassword');
       default: return t('common.error') + ': ' + err.message;
     }
@@ -29,18 +32,33 @@ export function LoginScreen() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    if (!aliasIsValid(alias)) { setError(t('login.aliasInvalid')); return; }
-    if (password.length < 8) { setError(t('login.weakPassword')); return; }
-    if (!isLogin && password !== confirm) { setError(t('login.confirmMismatch')); return; }
+    setError(''); setInfo('');
+    if (!isLogin) {
+      if (!aliasIsValid(identifier)) { setError(t('login.aliasInvalid')); return; }
+      if (password.length < 8) { setError(t('login.weakPassword')); return; }
+      if (password !== confirm) { setError(t('login.confirmMismatch')); return; }
+    }
     setLoading(true);
     try {
-      if (isLogin) await loginAlias(alias, password);
-      else await signupAlias(alias, password);
+      if (isLogin) await loginAlias(identifier, password);
+      else await signupAlias(identifier, password, email);
     } catch (err) {
       setError(mapError(err));
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleReset = async () => {
+    setError(''); setInfo('');
+    const em = window.prompt(t('login.resetPrompt'), '');
+    if (em === null) return;
+    if (!em.trim()) { setError(t('login.resetNoEmail')); return; }
+    try {
+      await resetPassword(em);
+      setInfo(t('login.resetSent'));
+    } catch (err) {
+      setError(mapError(err));
     }
   };
 
@@ -66,22 +84,24 @@ export function LoginScreen() {
           <p className="text-gray-400 text-xs mt-1">{t('login.subtitle')}</p>
         </div>
 
-        {/* Formulário alcunha + palavra-passe */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-purple-300 mb-2">{t('login.aliasLabel')}</label>
+            <label className="block text-sm font-medium text-purple-300 mb-2">
+              {isLogin ? t('login.identifierLabel') : t('login.aliasLabel')}
+            </label>
             <input
               type="text"
-              value={alias}
-              onChange={(e) => setAlias(e.target.value)}
-              placeholder={t('login.aliasPlaceholder')}
-              maxLength={24}
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
+              placeholder={isLogin ? t('login.identifierPlaceholder') : t('login.aliasPlaceholder')}
+              maxLength={64}
               autoComplete="off"
               className="w-full px-4 py-3 bg-gray-800 border-2 border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               required
               disabled={loading}
             />
           </div>
+
           <div>
             <label className="block text-sm font-medium text-purple-300 mb-2">{t('login.passwordLabel')}</label>
             <input
@@ -96,32 +116,50 @@ export function LoginScreen() {
             />
           </div>
 
-          {!isLogin && (
-            <div>
-              <label className="block text-sm font-medium text-purple-300 mb-2">{t('login.confirmLabel')}</label>
-              <input
-                type="password"
-                value={confirm}
-                onChange={(e) => setConfirm(e.target.value)}
-                placeholder={t('login.confirmPlaceholder')}
-                className="w-full px-4 py-3 bg-gray-800 border-2 border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                required
-                disabled={loading}
-                minLength={8}
-              />
+          {isLogin && (
+            <div className="text-right -mt-2">
+              <button type="button" onClick={handleReset} className="text-xs text-purple-400 hover:text-purple-300 transition-colors">
+                {t('login.forgot')}
+              </button>
             </div>
           )}
 
           {!isLogin && (
-            <p className="text-xs text-amber-300/90 bg-amber-900/20 border border-amber-700/40 rounded-lg p-3">
-              {t('login.noRecovery')}
-            </p>
+            <>
+              <div>
+                <label className="block text-sm font-medium text-purple-300 mb-2">{t('login.confirmLabel')}</label>
+                <input
+                  type="password"
+                  value={confirm}
+                  onChange={(e) => setConfirm(e.target.value)}
+                  placeholder={t('login.confirmPlaceholder')}
+                  className="w-full px-4 py-3 bg-gray-800 border-2 border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  required
+                  disabled={loading}
+                  minLength={8}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-purple-300 mb-2">{t('login.emailOptionalLabel')}</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder={t('login.emailOptionalPlaceholder')}
+                  autoComplete="off"
+                  className="w-full px-4 py-3 bg-gray-800 border-2 border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  disabled={loading}
+                />
+                <p className="text-xs text-gray-400 mt-2">{t('login.emailOptionalNote')}</p>
+              </div>
+            </>
           )}
 
+          {info && (
+            <div className="p-3 bg-green-900/30 border border-green-700/50 rounded-lg text-green-300 text-sm">{info}</div>
+          )}
           {error && (
-            <div className="p-3 bg-red-900/30 border border-red-700/50 rounded-lg text-red-300 text-sm">
-              {error}
-            </div>
+            <div className="p-3 bg-red-900/30 border border-red-700/50 rounded-lg text-red-300 text-sm">{error}</div>
           )}
 
           <button
@@ -148,14 +186,13 @@ export function LoginScreen() {
 
           <button
             type="button"
-            onClick={() => { setIsLogin(!isLogin); setError(''); setConfirm(''); }}
+            onClick={() => { setIsLogin(!isLogin); setError(''); setInfo(''); setConfirm(''); }}
             className="w-full text-purple-400 text-sm hover:text-purple-300 transition-colors"
           >
             {isLogin ? t('login.noAccount') : t('login.hasAccount')}
           </button>
         </form>
 
-        {/* Nota anonimato */}
         <div className="mt-6 bg-purple-900/20 border border-purple-700/50 rounded-lg p-4">
           <div className="flex items-start gap-2">
             <Icons.Shield className="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" />

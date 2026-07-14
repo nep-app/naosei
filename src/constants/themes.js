@@ -5,7 +5,7 @@ export const FORUM_THEMES = ['reduzir', 'recaidas', 'vitorias', 'apoio', 'duvida
 
 export const THEME_EMOJI = {
   reduzir: '🎛️', // etiqueta visível: "Gerir"
-  recaidas: '🔄',
+  recaidas: '🌧️', // etiqueta visível: "Momentos difíceis"
   vitorias: '🎉',
   apoio: '🤝',
   duvidas: '❓',
