@@ -75,6 +75,13 @@ export function ForumView({ showToast }) {
         ))}
       </div>
 
+      {theme !== 'all' && (
+        <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl px-4 py-2.5 mb-3 text-sm text-gray-300 flex items-center gap-2">
+          <span>{THEME_EMOJI[theme]}</span>
+          <span>{t(`themeDesc.${theme}`)}</span>
+        </div>
+      )}
+
       {posts.length === 0 ? (
         <div className="bg-gray-800/60 border border-dashed border-gray-700 rounded-2xl p-6 text-center text-gray-400 text-sm">
           {t('forum.noPosts')}

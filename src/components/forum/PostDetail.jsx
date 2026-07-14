@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as Icons from '../../Icons';
 import { useAuth } from '../../contexts/AuthContext';
-import { subscribeReplies, addReply, deletePost } from '../../data';
+import { subscribeReplies, addReply, deletePost, deleteReply } from '../../data';
 import { THEME_EMOJI } from '../../constants/themes';
 import { timeAgo } from '../../helpers';
 import { VoteButton } from './VoteButton';
@@ -10,7 +10,7 @@ import { ReportButton } from './ReportButton';
 
 export function PostDetail({ post, onBack, showToast }) {
   const { t } = useTranslation();
-  const { user, alias } = useAuth();
+  const { user, alias, isModerator } = useAuth();
   const [replies, setReplies] = useState([]);
   const [text, setText] = useState('');
   const [sending, setSending] = useState(false);
@@ -43,6 +43,15 @@ export function PostDetail({ post, onBack, showToast }) {
     }
   };
 
+  const removeReply = async (replyId) => {
+    if (!window.confirm(t('history.deleteConfirm'))) return;
+    try {
+      await deleteReply(post.id, replyId);
+    } catch {
+      showToast(t('common.error'), 'error');
+    }
+  };
+
   const isOwner = post.authorUid === user.uid;
 
   return (
@@ -69,8 +78,8 @@ export function PostDetail({ post, onBack, showToast }) {
           <VoteButton postId={post.id} />
           {!isOwner && <ReportButton postId={post.id} kind="post" />}
           <span className="text-xs text-gray-500 ml-auto">— {post.alias}</span>
-          {isOwner && (
-            <button onClick={removePost} className="text-gray-500 hover:text-red-400 p-1">
+          {(isOwner || isModerator) && (
+            <button onClick={removePost} title={isModerator && !isOwner ? t('forum.modDelete') : t('common.delete')} className="text-gray-500 hover:text-red-400 p-1">
               <Icons.Trash2 className="w-4 h-4" />
             </button>
           )}
@@ -94,11 +103,16 @@ export function PostDetail({ post, onBack, showToast }) {
                 <span className="text-xs text-gray-500">{timeAgo(r.ts, t)}</span>
               </div>
               <p className="text-sm text-gray-200 whitespace-pre-wrap">{r.body}</p>
-              {r.authorUid !== user.uid && (
-                <div className="mt-2 flex justify-end">
+              <div className="mt-2 flex justify-end items-center gap-3">
+                {r.authorUid !== user.uid && (
                   <ReportButton postId={post.id} replyId={r.id} kind="reply" />
-                </div>
-              )}
+                )}
+                {(r.authorUid === user.uid || isModerator) && (
+                  <button onClick={() => removeReply(r.id)} className="text-xs text-gray-500 hover:text-red-400 inline-flex items-center gap-1">
+                    <Icons.Trash2 className="w-3.5 h-3.5" /> {t('common.delete')}
+                  </button>
+                )}
+              </div>
             </div>
           ))}
         </div>

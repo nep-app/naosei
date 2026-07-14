@@ -35,6 +35,7 @@ export function aliasIsValid(alias) {
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [alias, setAlias] = useState(null);
+  const [isModerator, setIsModerator] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -47,8 +48,16 @@ export function AuthProvider({ children }) {
         } catch {
           setAlias(null);
         }
+        // É moderador se existir naosei_moderators/{uid} (criado na consola Firebase).
+        try {
+          const mod = await getDoc(doc(db, 'naosei_moderators', u.uid));
+          setIsModerator(mod.exists());
+        } catch {
+          setIsModerator(false);
+        }
       } else {
         setAlias(null);
+        setIsModerator(false);
       }
       setLoading(false);
     });
@@ -71,7 +80,7 @@ export function AuthProvider({ children }) {
   const logout = () => signOut(auth);
 
   return (
-    <AuthContext.Provider value={{ user, alias, loading, signupAlias, loginAlias, logout }}>
+    <AuthContext.Provider value={{ user, alias, isModerator, loading, signupAlias, loginAlias, logout }}>
       {children}
     </AuthContext.Provider>
   );

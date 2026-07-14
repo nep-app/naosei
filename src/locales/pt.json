@@ -102,6 +102,8 @@
     "report": "Denunciar",
     "reportConfirm": "Sinalizar esta mensagem para os moderadores?",
     "reported": "Obrigado. Foi sinalizado para revisão.",
+    "modDelete": "Apagar (moderação)",
+    "moderatorBadge": "Moderador/a",
     "replyPlaceholder": "Escreve uma resposta…",
     "sendReply": "Enviar",
     "replies_one": "{{count}} resposta",
@@ -125,6 +127,14 @@
     "apoio": "Pedir apoio",
     "duvidas": "Dúvidas",
     "geral": "Geral"
+  },
+  "themeDesc": {
+    "reduzir": "Estratégias e experiências para consumir menos ou de forma mais consciente.",
+    "recaidas": "Quando as coisas correm menos bem — sem julgamento, só apoio.",
+    "vitorias": "Conquistas, grandes ou pequenas. Celebrar o que corre bem.",
+    "apoio": "Precisas de desabafar ou de uma mão? Este é o sítio.",
+    "duvidas": "Perguntas sobre substâncias, efeitos, misturas e segurança.",
+    "geral": "Conversa livre sobre tudo o resto."
   },
   "safety": {
     "disclaimer": "Partilha entre pares — não é aconselhamento médico.",

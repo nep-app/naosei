@@ -46,6 +46,7 @@ export function NewPostModal({ onClose, showToast, defaultTheme }) {
               </button>
             ))}
           </div>
+          <p className="text-xs text-gray-400 mt-2">{t(`themeDesc.${theme}`)}</p>
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">{t('forum.postTitleLabel')}</label>

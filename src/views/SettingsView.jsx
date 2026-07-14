@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 
 export function SettingsView() {
   const { t, i18n } = useTranslation();
-  const { alias, logout } = useAuth();
+  const { alias, isModerator, logout } = useAuth();
 
   const changeLang = (lang) => { i18n.changeLanguage(lang); localStorage.setItem('nep_lang', lang); };
 
@@ -16,7 +16,14 @@ export function SettingsView() {
       <div className="space-y-4">
         <div className="bg-gray-800 rounded-2xl p-4 border border-gray-700/50">
           <div className="text-xs text-gray-400 mb-1">{t('settings.aliasInForum')}</div>
-          <div className="text-white font-medium break-all">{alias || '—'}</div>
+          <div className="flex items-center gap-2">
+            <div className="text-white font-medium break-all">{alias || '—'}</div>
+            {isModerator && (
+              <span className="text-xs px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 inline-flex items-center gap-1">
+                <Icons.Shield className="w-3 h-3" /> {t('forum.moderatorBadge')}
+              </span>
+            )}
+          </div>
         </div>
 
         <div className="bg-gray-800 rounded-2xl p-4 border border-gray-700/50">

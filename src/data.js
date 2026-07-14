@@ -72,6 +72,10 @@ export function subscribeReplies(postId, cb) {
   });
 }
 
+export function deleteReply(postId, replyId) {
+  return deleteDoc(doc(db, 'naosei_forum_posts', postId, 'replies', replyId));
+}
+
 export function addReply(postId, uid, alias, body) {
   return addDoc(collection(db, 'naosei_forum_posts', postId, 'replies'), {
     authorUid: uid,

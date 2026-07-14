@@ -102,6 +102,8 @@
     "report": "Report",
     "reportConfirm": "Flag this message for the moderators?",
     "reported": "Thank you. It's been flagged for review.",
+    "modDelete": "Delete (moderation)",
+    "moderatorBadge": "Moderator",
     "replyPlaceholder": "Write a reply…",
     "sendReply": "Send",
     "replies_one": "{{count}} reply",
@@ -125,6 +127,14 @@
     "apoio": "Asking for support",
     "duvidas": "Questions",
     "geral": "General"
+  },
+  "themeDesc": {
+    "reduzir": "Strategies and experiences for using less or more mindfully.",
+    "recaidas": "When things don't go so well — no judgement, just support.",
+    "vitorias": "Wins, big or small. Celebrating what's going well.",
+    "apoio": "Need to vent or a helping hand? This is the place.",
+    "duvidas": "Questions about substances, effects, mixing and safety.",
+    "geral": "Free chat about everything else."
   },
   "safety": {
     "disclaimer": "Peer sharing — not medical advice.",
