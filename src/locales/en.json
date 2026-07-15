@@ -179,6 +179,40 @@
     "openRules": "See rules",
     "openHelp": "Help / crisis"
   },
+  "profile": {
+    "title": "Your profile",
+    "edit": "Edit profile",
+    "bioLabel": "Bio (one line about you, without identifying yourself)",
+    "bioPlaceholder": "e.g. Trying to manage my days better.",
+    "reasonLabel": "What brings you here?",
+    "reasonNone": "Prefer not to say",
+    "save": "Save profile",
+    "saved": "Profile saved.",
+    "viewTitle": "Profile",
+    "noBio": "No bio yet."
+  },
+  "reasons": {
+    "apoio": "Support",
+    "partilhar": "Sharing experience",
+    "duvidas": "Asking questions",
+    "ajudar": "Helping others",
+    "ler": "Just reading"
+  },
+  "notif": {
+    "title": "Replies to your posts",
+    "empty": "Nothing new. When someone replies to your posts, it shows up here.",
+    "repliedTo": "replied to"
+  },
+  "reports": {
+    "title": "Reports",
+    "button": "Reports panel",
+    "empty": "No reports to review. 🎉",
+    "kindPost": "Post",
+    "kindReply": "Reply",
+    "open": "Open",
+    "dismiss": "Dismiss",
+    "gone": "(content no longer exists)"
+  },
   "settings": {
     "title": "Your account",
     "signedInAs": "Signed in as",

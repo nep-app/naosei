@@ -4,7 +4,7 @@
 //  - Fórum (partilhado, anónimo): naosei_forum_posts/*, replies, naosei_forum_votes/*
 
 import {
-  collection, doc, addDoc, deleteDoc, setDoc, getDoc, updateDoc,
+  collection, doc, addDoc, deleteDoc, setDoc, getDoc, getDocs, updateDoc,
   query, where, orderBy, onSnapshot, serverTimestamp,
 } from 'firebase/firestore';
 import { db } from './firebase';
@@ -31,6 +31,50 @@ export function addEntry(uid, data) {
 
 export function deleteEntry(uid, id) {
   return deleteDoc(doc(db, 'naosei_users', uid, 'entries', id));
+}
+
+// ---------- PERFIL (alcunha + bio + "o que te traz aqui") ----------
+export async function getProfile(uid) {
+  const snap = await getDoc(doc(db, 'naosei_profiles', uid));
+  return snap.exists() ? snap.data() : null;
+}
+export function saveProfile(uid, { alias, bio, reason }) {
+  return setDoc(
+    doc(db, 'naosei_profiles', uid),
+    { alias, bio: (bio || '').slice(0, 300), reason: reason || '' },
+    { merge: true }
+  );
+}
+
+// ---------- NOTIFICAÇÕES: novas respostas aos meus posts ----------
+// Busca (uma vez) as respostas a publicações minhas mais recentes que `sinceTs`,
+// feitas por outra pessoa. Devolve [{ post, reply }] mais recentes primeiro.
+export async function getMyNewReplies(uid, sinceTs) {
+  const postsSnap = await getDocs(
+    query(collection(db, 'naosei_forum_posts'), where('authorUid', '==', uid))
+  );
+  const out = [];
+  for (const pdoc of postsSnap.docs) {
+    const post = { id: pdoc.id, ...pdoc.data() };
+    const repSnap = await getDocs(collection(db, 'naosei_forum_posts', post.id, 'replies'));
+    repSnap.forEach((rdoc) => {
+      const reply = { id: rdoc.id, ...rdoc.data() };
+      if ((reply.ts || 0) > (sinceTs || 0) && reply.authorUid !== uid) {
+        out.push({ post, reply });
+      }
+    });
+  }
+  out.sort((a, b) => (b.reply.ts || 0) - (a.reply.ts || 0));
+  return out;
+}
+
+// ---------- DENÚNCIAS (moderadores) ----------
+export function subscribeReports(cb) {
+  const q = query(collection(db, 'naosei_forum_reports'), orderBy('createdAt', 'desc'));
+  return onSnapshot(q, (snap) => cb(snap.docs.map((d) => ({ id: d.id, ...d.data() }))));
+}
+export function resolveReport(reportId) {
+  return deleteDoc(doc(db, 'naosei_forum_reports', reportId));
 }
 
 // ---------- FÓRUM (partilhado, anónimo) ----------

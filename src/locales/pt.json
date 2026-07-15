@@ -179,6 +179,40 @@
     "openRules": "Ver regras",
     "openHelp": "Ajuda / crise"
   },
+  "profile": {
+    "title": "O teu perfil",
+    "edit": "Editar perfil",
+    "bioLabel": "Bio (uma frase sobre ti, sem te identificares)",
+    "bioPlaceholder": "ex.: A tentar gerir melhor os meus dias.",
+    "reasonLabel": "O que te traz aqui?",
+    "reasonNone": "Prefiro não dizer",
+    "save": "Guardar perfil",
+    "saved": "Perfil guardado.",
+    "viewTitle": "Perfil",
+    "noBio": "Ainda sem bio."
+  },
+  "reasons": {
+    "apoio": "Apoio",
+    "partilhar": "Partilhar experiência",
+    "duvidas": "Tirar dúvidas",
+    "ajudar": "Ajudar outros",
+    "ler": "Só ler"
+  },
+  "notif": {
+    "title": "Respostas aos teus posts",
+    "empty": "Sem novidades. Quando alguém responder aos teus posts, aparece aqui.",
+    "repliedTo": "respondeu a"
+  },
+  "reports": {
+    "title": "Denúncias",
+    "button": "Painel de denúncias",
+    "empty": "Sem denúncias por rever. 🎉",
+    "kindPost": "Publicação",
+    "kindReply": "Resposta",
+    "open": "Abrir",
+    "dismiss": "Descartar",
+    "gone": "(conteúdo já não existe)"
+  },
   "settings": {
     "title": "A tua conta",
     "signedInAs": "Sessão iniciada como",
