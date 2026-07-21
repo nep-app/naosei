@@ -299,11 +299,13 @@ export function deleteReply(postId, replyId) {
   return deleteDoc(doc(db, 'naosei_forum_posts', postId, 'replies', replyId));
 }
 
-export function addReply(postId, uid, alias, body) {
+export function addReply(postId, uid, alias, body, parent = null) {
   return addDoc(collection(db, 'naosei_forum_posts', postId, 'replies'), {
     authorUid: uid,
     alias,
     body: body.trim().slice(0, 3000),
+    parentReplyId: parent ? parent.id : null,
+    parentAlias: parent ? parent.alias : null,
     createdAt: serverTimestamp(),
     ts: Date.now(),
   });

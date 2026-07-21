@@ -108,6 +108,7 @@
     "cancel": "Cancelar",
     "published": "Publicado.",
     "reply": "Responder",
+    "replyingTo": "A responder a {{alias}}",
     "report": "Denunciar",
     "reportConfirm": "Sinalizar esta mensagem para os moderadores?",
     "reported": "Obrigado. Foi sinalizado para revisão.",

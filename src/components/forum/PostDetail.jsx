@@ -15,11 +15,18 @@ export function PostDetail({ post, onBack, showToast, onOpenProfile }) {
   const [voteCounts, setVoteCounts] = useState({});
   const [text, setText] = useState('');
   const [sending, setSending] = useState(false);
+  const [replyingTo, setReplyingTo] = useState(null); // { id, alias, authorUid }
 
-  // Respostas mais apoiadas primeiro; empate → mais antiga primeiro.
-  const sortedReplies = [...replies].sort(
+  // Fios: agrupa respostas por "a quem respondem". Raiz = respostas ao post.
+  const childrenByParent = {};
+  replies.forEach((r) => {
+    const k = r.parentReplyId || '__root';
+    (childrenByParent[k] = childrenByParent[k] || []).push(r);
+  });
+  const rootReplies = (childrenByParent['__root'] || []).slice().sort(
     (a, b) => (voteCounts[b.id] || 0) - (voteCounts[a.id] || 0) || (a.ts || 0) - (b.ts || 0)
   );
+  const childrenOf = (id) => (childrenByParent[id] || []).slice().sort((a, b) => (a.ts || 0) - (b.ts || 0));
   const [editing, setEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(post.title);
   const [editBody, setEditBody] = useState(post.body);
@@ -50,10 +57,19 @@ export function PostDetail({ post, onBack, showToast, onOpenProfile }) {
   const send = async () => {
     if (!text.trim()) return;
     setSending(true);
+    const parent = replyingTo;
     try {
-      await addReply(post.id, user.uid, alias, text);
-      addActivity(user.uid, alias, { forUid: post.authorUid, type: 'reply', targetKind: 'post', targetId: post.id, targetTitle: post.title });
+      await addReply(post.id, user.uid, alias, text, parent ? { id: parent.id, alias: parent.alias } : null);
+      // Avisa: se respondes a uma resposta, avisa o autor dela; senão, o autor do post.
+      addActivity(user.uid, alias, {
+        forUid: parent ? parent.authorUid : post.authorUid,
+        type: 'reply',
+        targetKind: parent ? 'reply' : 'post',
+        targetId: parent ? parent.id : post.id,
+        targetTitle: post.title,
+      });
       setText('');
+      setReplyingTo(null);
     } catch {
       showToast(t('common.error'), 'error');
     } finally {
@@ -81,6 +97,41 @@ export function PostDetail({ post, onBack, showToast, onOpenProfile }) {
   };
 
   const isOwner = post.authorUid === user.uid;
+
+  // Render recursivo de uma resposta e das respostas-à-resposta (fios).
+  const renderReply = (r, depth) => (
+    <div key={r.id} className={depth > 0 ? 'ml-3 sm:ml-5 border-l-2 border-gray-700/60 pl-3' : ''}>
+      <div className="bg-gray-800 rounded-2xl p-4 border border-gray-700/50">
+        <div className="flex items-center justify-between mb-1.5">
+          <button onClick={() => onOpenProfile && onOpenProfile(r.authorUid, r.alias)} className="text-sm font-semibold text-purple-300 hover:text-purple-200">{r.alias}</button>
+          <span className="text-xs text-gray-500">{formatDateLabel(r.ts, i18n.language)}</span>
+        </div>
+        {r.parentAlias && (
+          <div className="text-[11px] text-gray-500 mb-1">↳ {t('forum.replyingTo', { alias: r.parentAlias })}</div>
+        )}
+        <p className="text-sm text-gray-200 whitespace-pre-wrap">{r.body}</p>
+        <div className="mt-2 flex items-center gap-3">
+          <VoteButton postId={r.id} size="sm" onCount={(n) => setVoteCounts((m) => (m[r.id] === n ? m : { ...m, [r.id]: n }))} activity={{ forUid: r.authorUid, targetKind: 'reply', targetId: r.id, targetTitle: post.title }} />
+          <div className="ml-auto flex items-center gap-3">
+            <button onClick={() => setReplyingTo({ id: r.id, alias: r.alias, authorUid: r.authorUid })} className="text-xs text-gray-500 hover:text-purple-300 inline-flex items-center gap-1">
+              <Icons.MessageSquare className="w-3.5 h-3.5" /> {t('forum.reply')}
+            </button>
+            {r.authorUid !== user.uid && (
+              <ReportButton postId={post.id} replyId={r.id} kind="reply" />
+            )}
+            {(r.authorUid === user.uid || isModerator) && (
+              <button onClick={() => removeReply(r.id)} className="text-xs text-gray-500 hover:text-red-400 inline-flex items-center gap-1">
+                <Icons.Trash2 className="w-3.5 h-3.5" /> {t('common.delete')}
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+      {childrenOf(r.id).length > 0 && (
+        <div className="mt-2 space-y-2">{childrenOf(r.id).map((c) => renderReply(c, depth + 1))}</div>
+      )}
+    </div>
+  );
 
   return (
     <div>
@@ -171,28 +222,14 @@ export function PostDetail({ post, onBack, showToast, onOpenProfile }) {
         </div>
       ) : (
         <div className="space-y-3 mb-4">
-          {sortedReplies.map((r) => (
-            <div key={r.id} className="bg-gray-800 rounded-2xl p-4 border border-gray-700/50">
-              <div className="flex items-center justify-between mb-1.5">
-                <button onClick={() => onOpenProfile && onOpenProfile(r.authorUid, r.alias)} className="text-sm font-semibold text-purple-300 hover:text-purple-200">{r.alias}</button>
-                <span className="text-xs text-gray-500">{formatDateLabel(r.ts, i18n.language)}</span>
-              </div>
-              <p className="text-sm text-gray-200 whitespace-pre-wrap">{r.body}</p>
-              <div className="mt-2 flex items-center gap-3">
-                <VoteButton postId={r.id} size="sm" onCount={(n) => setVoteCounts((m) => (m[r.id] === n ? m : { ...m, [r.id]: n }))} activity={{ forUid: r.authorUid, targetKind: 'reply', targetId: r.id, targetTitle: post.title }} />
-                <div className="ml-auto flex items-center gap-3">
-                  {r.authorUid !== user.uid && (
-                    <ReportButton postId={post.id} replyId={r.id} kind="reply" />
-                  )}
-                  {(r.authorUid === user.uid || isModerator) && (
-                    <button onClick={() => removeReply(r.id)} className="text-xs text-gray-500 hover:text-red-400 inline-flex items-center gap-1">
-                      <Icons.Trash2 className="w-3.5 h-3.5" /> {t('common.delete')}
-                    </button>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))}
+          {rootReplies.map((r) => renderReply(r, 0))}
+        </div>
+      )}
+
+      {replyingTo && (
+        <div className="flex items-center justify-between bg-purple-900/20 border border-purple-700/40 rounded-lg px-3 py-2 mb-2 text-xs text-purple-200">
+          <span>↳ {t('forum.replyingTo', { alias: replyingTo.alias })}</span>
+          <button onClick={() => setReplyingTo(null)} className="text-gray-400 hover:text-white"><Icons.X className="w-4 h-4" /></button>
         </div>
       )}
 
