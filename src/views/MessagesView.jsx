@@ -34,11 +34,17 @@ export function MessagesView({ dmTarget, onConsumeDmTarget, showToast }) {
   // Abrir/iniciar conversa a partir do perfil (botão "Enviar mensagem").
   useEffect(() => {
     if (!dmTarget || !user || !alias) return;
+    const target = dmTarget;
     (async () => {
-      const id = await startConversation(user.uid, alias, dmTarget.uid, dmTarget.alias);
-      setOpenId(id);
-      setOpenWith({ uid: dmTarget.uid, alias: dmTarget.alias });
-      onConsumeDmTarget();
+      try {
+        const id = await startConversation(user.uid, alias, target.uid, target.alias);
+        setOpenId(id);
+        setOpenWith({ uid: target.uid, alias: target.alias });
+      } catch {
+        showToast(t('common.error'), 'error');
+      } finally {
+        onConsumeDmTarget();
+      }
     })();
   }, [dmTarget, user, alias]);
 

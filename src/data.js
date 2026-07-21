@@ -84,17 +84,13 @@ export function convIdFor(a, b) {
 
 export async function startConversation(me, meAlias, other, otherAlias) {
   const id = convIdFor(me, other);
-  const ref = doc(db, 'naosei_dms', id);
-  const snap = await getDoc(ref);
-  if (!snap.exists()) {
-    await setDoc(ref, {
-      participants: [me, other],
-      aliases: { [me]: meAlias, [other]: otherAlias },
-      lastMessage: '',
-      lastTs: Date.now(),
-      lastSender: '',
-    });
-  }
+  // Cria (ou atualiza as alcunhas) sem LER primeiro — ler uma conversa que ainda
+  // não existe é recusado pelas regras. O merge não mexe na última mensagem.
+  await setDoc(
+    doc(db, 'naosei_dms', id),
+    { participants: [me, other], aliases: { [me]: meAlias, [other]: otherAlias } },
+    { merge: true }
+  );
   return id;
 }
 
