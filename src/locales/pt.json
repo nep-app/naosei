@@ -229,6 +229,10 @@
     "whatPost": "a tua publicação",
     "whatReply": "o teu comentário"
   },
+  "leaderboard": {
+    "title": "🏆 Em destaque",
+    "subtitle": "Vozes que têm recebido mais apoio na comunidade"
+  },
   "reports": {
     "title": "Denúncias",
     "button": "Painel de denúncias",

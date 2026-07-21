@@ -229,6 +229,10 @@
     "whatPost": "your post",
     "whatReply": "your comment"
   },
+  "leaderboard": {
+    "title": "🏆 Featured",
+    "subtitle": "Voices getting the most support in the community"
+  },
   "reports": {
     "title": "Reports",
     "button": "Reports panel",

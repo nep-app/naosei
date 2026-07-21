@@ -4,8 +4,8 @@
 //  - Fórum (partilhado, anónimo): naosei_forum_posts/*, replies, naosei_forum_votes/*
 
 import {
-  collection, doc, addDoc, deleteDoc, setDoc, getDoc, getDocs, updateDoc,
-  query, where, orderBy, onSnapshot, serverTimestamp,
+  collection, collectionGroup, doc, addDoc, deleteDoc, setDoc, getDoc, getDocs, updateDoc,
+  query, where, orderBy, limit, onSnapshot, serverTimestamp,
 } from 'firebase/firestore';
 import { db } from './firebase';
 
@@ -52,6 +52,41 @@ export function saveProfile(uid, { alias, bio, reasons, doc: docList, docOther, 
     },
     { merge: true }
   );
+}
+
+// ---------- KARMA + "EM DESTAQUE" ----------
+// Karma = total de apoios (❤) recebidos nas minhas publicações e respostas.
+// Cada pessoa recalcula o SEU karma quando abre a Conta (só o dono escreve).
+export async function computeMyKarma(uid) {
+  let total = 0;
+  try {
+    const posts = await getDocs(query(collection(db, 'naosei_forum_posts'), where('authorUid', '==', uid)));
+    for (const pd of posts.docs) {
+      const v = await getDocs(query(collection(db, 'naosei_forum_votes'), where('postId', '==', pd.id)));
+      total += v.size;
+    }
+  } catch { /* ignora */ }
+  try {
+    const reps = await getDocs(query(collectionGroup(db, 'replies'), where('authorUid', '==', uid)));
+    for (const rd of reps.docs) {
+      const v = await getDocs(query(collection(db, 'naosei_forum_votes'), where('postId', '==', rd.id)));
+      total += v.size;
+    }
+  } catch { /* ignora (sem índice de replies): fica só o karma dos posts */ }
+  try {
+    await setDoc(doc(db, 'naosei_profiles', uid), { karma: total }, { merge: true });
+  } catch { /* ignora */ }
+  return total;
+}
+
+// Top N por karma (para o "Em destaque"). Não devolve números para mostrar.
+export async function getTopProfiles(n = 3) {
+  try {
+    const snap = await getDocs(query(collection(db, 'naosei_profiles'), orderBy('karma', 'desc'), limit(n)));
+    return snap.docs.map((d) => ({ uid: d.id, ...d.data() })).filter((p) => (p.karma || 0) > 0);
+  } catch {
+    return [];
+  }
 }
 
 // ---------- NOTIFICAÇÕES: novas respostas aos meus posts ----------

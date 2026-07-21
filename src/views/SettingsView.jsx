@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as Icons from '../Icons';
 import { useAuth } from '../contexts/AuthContext';
-import { getProfile, saveProfile } from '../data';
+import { getProfile, saveProfile, computeMyKarma } from '../data';
 import { ReportsPanel } from '../components/forum/ReportsPanel';
 import { DOC_OPTIONS, ROA_OPTIONS } from '../constants/profileOptions';
 
@@ -31,6 +31,8 @@ export function SettingsView({ showToast }) {
         setRoaSel(p.roa || []); setRoaOther(p.roaOther || '');
       }
     });
+    // Recalcula o karma (apoios recebidos) em segundo plano, para o "Em destaque".
+    computeMyKarma(user.uid);
   }, [user]);
 
   const toggle = (list, setList, key) =>

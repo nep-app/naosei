@@ -10,6 +10,7 @@ import { NewPostModal } from '../components/forum/NewPostModal';
 import { SafetyBar } from '../components/forum/SafetyBar';
 import { NotificationsButton } from '../components/forum/NotificationsButton';
 import { ProfileCard } from '../components/forum/ProfileCard';
+import { LeaderboardCard } from '../components/forum/LeaderboardCard';
 
 export function ForumView({ showToast, onStartDM }) {
   const { t } = useTranslation();
@@ -93,6 +94,8 @@ export function ForumView({ showToast, onStartDM }) {
       </header>
 
       <SafetyBar />
+
+      <LeaderboardCard onOpenProfile={openProfile} />
 
       {/* Pesquisa */}
       <div className="relative mb-3">
