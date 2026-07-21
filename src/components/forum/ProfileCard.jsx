@@ -36,6 +36,26 @@ export function ProfileCard({ uid, alias, onClose }) {
           <p className="text-sm text-gray-200">
             {profile?.bio ? profile.bio : <span className="text-gray-500 italic">{t('profile.noBio')}</span>}
           </p>
+          {profile?.doc?.length > 0 && (
+            <div>
+              <div className="text-xs text-gray-400 mb-1">{t('doc.label')}</div>
+              <div className="flex flex-wrap gap-1.5">
+                {profile.doc.map((k) => (
+                  <span key={k} className="text-xs px-2 py-0.5 rounded-full bg-gray-700 text-gray-200">{t(`doc.${k}`, k)}</span>
+                ))}
+              </div>
+            </div>
+          )}
+          {profile?.roa?.length > 0 && (
+            <div>
+              <div className="text-xs text-gray-400 mb-1">{t('roa.label')}</div>
+              <div className="flex flex-wrap gap-1.5">
+                {profile.roa.map((k) => (
+                  <span key={k} className="text-xs px-2 py-0.5 rounded-full bg-gray-700 text-gray-200">{t(`roa.${k}`, k)}</span>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </Modal>

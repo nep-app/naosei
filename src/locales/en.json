@@ -198,6 +198,19 @@
     "ajudar": "Helping others",
     "ler": "Just reading"
   },
+  "doc": {
+    "label": "Drug(s) of choice (DOC)",
+    "mdma": "MDMA", "cocaina": "Cocaine", "cannabis": "Cannabis", "ketamina": "Ketamine",
+    "lsd": "LSD", "cogumelos": "Mushrooms", "anfetaminas": "Amphetamines/Speed",
+    "alcool": "Alcohol", "opioides": "Opioids", "benzo": "Benzodiazepines",
+    "ghb": "GHB/GBL", "2cb": "2C-B", "tabaco": "Tobacco", "outra": "Other"
+  },
+  "roa": {
+    "label": "Route(s) of administration (ROA)",
+    "oral": "Oral", "sublingual": "Sublingual", "insuflado": "Snorted",
+    "fumado": "Smoked", "vaporizado": "Vaporised", "injetado": "Injected",
+    "retal": "Rectal", "outra": "Other"
+  },
   "notif": {
     "title": "Replies to your posts",
     "empty": "Nothing new. When someone replies to your posts, it shows up here.",

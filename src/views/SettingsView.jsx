@@ -4,6 +4,7 @@ import * as Icons from '../Icons';
 import { useAuth } from '../contexts/AuthContext';
 import { getProfile, saveProfile } from '../data';
 import { ReportsPanel } from '../components/forum/ReportsPanel';
+import { DOC_OPTIONS, ROA_OPTIONS } from '../constants/profileOptions';
 
 const REASONS = ['apoio', 'partilhar', 'duvidas', 'ajudar', 'ler'];
 
@@ -13,22 +14,30 @@ export function SettingsView({ showToast }) {
 
   const [bio, setBio] = useState('');
   const [reason, setReason] = useState('');
+  const [docSel, setDocSel] = useState([]);
+  const [roaSel, setRoaSel] = useState([]);
   const [saving, setSaving] = useState(false);
   const [showReports, setShowReports] = useState(false);
 
   useEffect(() => {
     if (!user) return;
     getProfile(user.uid).then((p) => {
-      if (p) { setBio(p.bio || ''); setReason(p.reason || ''); }
+      if (p) {
+        setBio(p.bio || ''); setReason(p.reason || '');
+        setDocSel(p.doc || []); setRoaSel(p.roa || []);
+      }
     });
   }, [user]);
+
+  const toggle = (list, setList, key) =>
+    setList(list.includes(key) ? list.filter((x) => x !== key) : [...list, key]);
 
   const changeLang = (lang) => { i18n.changeLanguage(lang); localStorage.setItem('nep_lang', lang); };
 
   const saveMyProfile = async () => {
     setSaving(true);
     try {
-      await saveProfile(user.uid, { alias, bio, reason });
+      await saveProfile(user.uid, { alias, bio, reason, doc: docSel, roa: roaSel });
       showToast(t('profile.saved'), 'success');
     } catch {
       showToast(t('common.error'), 'error');
@@ -77,6 +86,34 @@ export function SettingsView({ showToast }) {
                   className={'px-3 py-1.5 rounded-full text-sm transition-all ' + (reason === r ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600')}
                 >
                   {t(`reasons.${r}`)}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs text-gray-400 mb-1.5">{t('doc.label')}</label>
+            <div className="flex flex-wrap gap-2">
+              {DOC_OPTIONS.map((k) => (
+                <button
+                  key={k}
+                  onClick={() => toggle(docSel, setDocSel, k)}
+                  className={'px-3 py-1.5 rounded-full text-sm transition-all ' + (docSel.includes(k) ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600')}
+                >
+                  {t(`doc.${k}`)}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs text-gray-400 mb-1.5">{t('roa.label')}</label>
+            <div className="flex flex-wrap gap-2">
+              {ROA_OPTIONS.map((k) => (
+                <button
+                  key={k}
+                  onClick={() => toggle(roaSel, setRoaSel, k)}
+                  className={'px-3 py-1.5 rounded-full text-sm transition-all ' + (roaSel.includes(k) ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600')}
+                >
+                  {t(`roa.${k}`)}
                 </button>
               ))}
             </div>

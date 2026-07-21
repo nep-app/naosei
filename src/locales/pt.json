@@ -198,6 +198,19 @@
     "ajudar": "Ajudar outros",
     "ler": "Só ler"
   },
+  "doc": {
+    "label": "Substância(s) de eleição (DOC)",
+    "mdma": "MDMA", "cocaina": "Cocaína", "cannabis": "Canábis", "ketamina": "Ketamina",
+    "lsd": "LSD", "cogumelos": "Cogumelos", "anfetaminas": "Anfetaminas/Speed",
+    "alcool": "Álcool", "opioides": "Opióides", "benzo": "Benzodiazepinas",
+    "ghb": "GHB/GBL", "2cb": "2C-B", "tabaco": "Tabaco", "outra": "Outra"
+  },
+  "roa": {
+    "label": "Via(s) de administração (ROA)",
+    "oral": "Oral", "sublingual": "Sublingual", "insuflado": "Insuflado",
+    "fumado": "Fumado", "vaporizado": "Vaporizado", "injetado": "Injetado",
+    "retal": "Retal", "outra": "Outra"
+  },
   "notif": {
     "title": "Respostas aos teus posts",
     "empty": "Sem novidades. Quando alguém responder aos teus posts, aparece aqui.",
