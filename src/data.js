@@ -74,6 +74,72 @@ export async function getMyNewReplies(uid, sinceTs) {
   return out;
 }
 
+// ---------- MENSAGENS PRIVADAS (DMs) ----------
+// Conversa entre 2 pessoas. ID determinístico = uids ordenados juntos.
+export function convIdFor(a, b) {
+  return [a, b].sort().join('__');
+}
+
+export async function startConversation(me, meAlias, other, otherAlias) {
+  const id = convIdFor(me, other);
+  const ref = doc(db, 'naosei_dms', id);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) {
+    await setDoc(ref, {
+      participants: [me, other],
+      aliases: { [me]: meAlias, [other]: otherAlias },
+      lastMessage: '',
+      lastTs: Date.now(),
+      lastSender: '',
+    });
+  }
+  return id;
+}
+
+export function subscribeConversations(uid, cb) {
+  const q = query(collection(db, 'naosei_dms'), where('participants', 'array-contains', uid));
+  return onSnapshot(q, (snap) => {
+    const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    list.sort((a, b) => (b.lastTs || 0) - (a.lastTs || 0));
+    cb(list);
+  });
+}
+
+export function subscribeMessages(convId, cb) {
+  const q = query(collection(db, 'naosei_dms', convId, 'messages'), orderBy('ts', 'asc'));
+  return onSnapshot(q, (snap) => cb(snap.docs.map((d) => ({ id: d.id, ...d.data() }))));
+}
+
+export async function sendMessage(convId, senderUid, senderAlias, body) {
+  const text = body.trim().slice(0, 3000);
+  await addDoc(collection(db, 'naosei_dms', convId, 'messages'), {
+    senderUid, senderAlias, body: text, ts: Date.now(), createdAt: serverTimestamp(),
+  });
+  await updateDoc(doc(db, 'naosei_dms', convId), {
+    lastMessage: text, lastTs: Date.now(), lastSender: senderUid,
+  });
+}
+
+// Bloqueios (privado do dono). Bloquear alguém impede-o de te escrever (regras).
+export function subscribeBlocks(uid, cb) {
+  return onSnapshot(collection(db, 'naosei_users', uid, 'blocks'), (snap) => cb(snap.docs.map((d) => d.id)));
+}
+export function blockUser(uid, otherUid) {
+  return setDoc(doc(db, 'naosei_users', uid, 'blocks', otherUid), { ts: Date.now() });
+}
+export function unblockUser(uid, otherUid) {
+  return deleteDoc(doc(db, 'naosei_users', uid, 'blocks', otherUid));
+}
+
+// Denunciar uma pessoa/conversa (partilha a última mensagem para os moderadores verem).
+export function reportUser(reporterUid, { reportedUid, convId, sample }) {
+  return addDoc(collection(db, 'naosei_forum_reports'), {
+    kind: 'dm', reporterUid, reportedUid, convId,
+    sample: (sample || '').slice(0, 500),
+    createdAt: serverTimestamp(), ts: Date.now(), status: 'open',
+  });
+}
+
 // ---------- DENÚNCIAS (moderadores) ----------
 export async function getPost(postId) {
   const snap = await getDoc(doc(db, 'naosei_forum_posts', postId));

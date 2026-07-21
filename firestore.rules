@@ -92,6 +92,31 @@ service cloud.firestore {
       allow update: if false;
     }
 
+    // ---- Mensagens privadas (DMs) ----
+    // Só os 2 participantes leem/escrevem. Bloquear alguém impede-o de te escrever.
+    match /naosei_dms/{convId} {
+      allow read: if isSignedIn() && request.auth.uid in resource.data.participants;
+      allow create: if isSignedIn()
+        && request.auth.uid in request.resource.data.participants
+        && request.resource.data.participants.size() == 2;
+      allow update: if isSignedIn() && request.auth.uid in resource.data.participants;
+      allow delete: if false;
+
+      match /messages/{msgId} {
+        function conv() { return get(/databases/$(database)/documents/naosei_dms/$(convId)).data; }
+        function recipient() {
+          return conv().participants[0] == request.auth.uid ? conv().participants[1] : conv().participants[0];
+        }
+        allow read: if isSignedIn() && request.auth.uid in conv().participants;
+        allow create: if isSignedIn()
+          && request.resource.data.senderUid == request.auth.uid
+          && request.auth.uid in conv().participants
+          && !exists(/databases/$(database)/documents/naosei_users/$(recipient())/blocks/$(request.auth.uid));
+        allow delete: if isSignedIn() && resource.data.senderUid == request.auth.uid;
+        allow update: if false;
+      }
+    }
+
     // ---- Negar tudo o resto ----
     match /{document=**} {
       allow read, write: if false;

@@ -223,9 +223,25 @@
     "empty": "Sem denúncias por rever. 🎉",
     "kindPost": "Publicação",
     "kindReply": "Resposta",
+    "kindDm": "Mensagem privada",
     "open": "Abrir",
     "dismiss": "Descartar",
     "gone": "(conteúdo já não existe)"
+  },
+  "dm": {
+    "nav": "Mensagens",
+    "title": "Mensagens privadas",
+    "safety": "A moderação NÃO vê as mensagens privadas. Se te venderem algo ou te incomodarem: bloqueia e denuncia.",
+    "empty": "Sem conversas ainda. Podes iniciar uma a partir do perfil de alguém no fórum.",
+    "send": "Enviar mensagem",
+    "placeholder": "Escreve uma mensagem…",
+    "block": "Bloquear",
+    "unblock": "Desbloquear",
+    "blockedNote": "Bloqueaste esta pessoa — não te pode escrever.",
+    "blockConfirm": "Bloquear esta pessoa? Deixa de te poder escrever.",
+    "report": "Denunciar",
+    "reported": "Denúncia enviada aos moderadores.",
+    "reportConfirm": "Denunciar esta pessoa aos moderadores? A última mensagem é partilhada com eles."
   },
   "settings": {
     "title": "A tua conta",

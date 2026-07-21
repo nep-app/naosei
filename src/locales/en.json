@@ -223,9 +223,25 @@
     "empty": "No reports to review. 🎉",
     "kindPost": "Post",
     "kindReply": "Reply",
+    "kindDm": "Private message",
     "open": "Open",
     "dismiss": "Dismiss",
     "gone": "(content no longer exists)"
+  },
+  "dm": {
+    "nav": "Messages",
+    "title": "Private messages",
+    "safety": "Moderators do NOT see private messages. If someone sells you something or bothers you: block and report.",
+    "empty": "No conversations yet. You can start one from someone's profile in the forum.",
+    "send": "Send message",
+    "placeholder": "Write a message…",
+    "block": "Block",
+    "unblock": "Unblock",
+    "blockedNote": "You blocked this person — they can't message you.",
+    "blockConfirm": "Block this person? They won't be able to message you.",
+    "report": "Report",
+    "reported": "Report sent to the moderators.",
+    "reportConfirm": "Report this person to the moderators? The last message is shared with them."
   },
   "settings": {
     "title": "Your account",

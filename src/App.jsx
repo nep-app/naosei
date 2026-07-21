@@ -4,6 +4,7 @@ import * as Icons from './Icons';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LoginScreen } from './components/LoginScreen';
 import { ForumView } from './views/ForumView';
+import { MessagesView } from './views/MessagesView';
 import { SettingsView } from './views/SettingsView';
 
 function Toasts({ toasts }) {
@@ -30,6 +31,9 @@ function Shell() {
   const { user, loading } = useAuth();
   const [view, setView] = useState('forum');
   const [toasts, setToasts] = useState([]);
+  const [dmTarget, setDmTarget] = useState(null);
+
+  const startDM = (uid, alias) => { setDmTarget({ uid, alias }); setView('messages'); };
 
   const showToast = (message, type = 'success') => {
     const id = `${Date.now()}-${Math.floor(Math.random() * 1000)}`;
@@ -49,13 +53,15 @@ function Shell() {
 
   const navItems = [
     { key: 'forum', icon: Icons.MessageSquare, label: t('nav.forum') },
+    { key: 'messages', icon: Icons.Send, label: t('dm.nav') },
     { key: 'settings', icon: Icons.User, label: t('nav.settings') },
   ];
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100 pb-24">
       <div className="max-w-2xl mx-auto px-4 pt-6">
-        {view === 'forum' && <ForumView showToast={showToast} />}
+        {view === 'forum' && <ForumView showToast={showToast} onStartDM={startDM} />}
+        {view === 'messages' && <MessagesView dmTarget={dmTarget} onConsumeDmTarget={() => setDmTarget(null)} showToast={showToast} />}
         {view === 'settings' && <SettingsView showToast={showToast} />}
       </div>
 
@@ -65,7 +71,7 @@ function Shell() {
         style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}
       >
         <div className="max-w-2xl mx-auto">
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-3 gap-2">
             {navItems.map(({ key, icon: Icon, label }) => (
               <button
                 key={key}

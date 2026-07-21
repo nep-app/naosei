@@ -11,7 +11,7 @@ import { SafetyBar } from '../components/forum/SafetyBar';
 import { NotificationsButton } from '../components/forum/NotificationsButton';
 import { ProfileCard } from '../components/forum/ProfileCard';
 
-export function ForumView({ showToast }) {
+export function ForumView({ showToast, onStartDM }) {
   const { t } = useTranslation();
   const { user, alias } = useAuth();
   const [theme, setTheme] = useState('all');
@@ -64,7 +64,7 @@ export function ForumView({ showToast }) {
     return (
       <>
         <PostDetail post={fresh} onBack={() => setOpenPost(null)} showToast={showToast} onOpenProfile={openProfile} />
-        {profileTarget && <ProfileCard uid={profileTarget.uid} alias={profileTarget.alias} onClose={() => setProfileTarget(null)} />}
+        {profileTarget && <ProfileCard uid={profileTarget.uid} alias={profileTarget.alias} onClose={() => setProfileTarget(null)} onStartDM={onStartDM} />}
       </>
     );
   }
@@ -152,7 +152,7 @@ export function ForumView({ showToast }) {
       )}
 
       {showNew && <NewPostModal onClose={() => setShowNew(false)} showToast={showToast} defaultTheme={theme} />}
-      {profileTarget && <ProfileCard uid={profileTarget.uid} alias={profileTarget.alias} onClose={() => setProfileTarget(null)} />}
+      {profileTarget && <ProfileCard uid={profileTarget.uid} alias={profileTarget.alias} onClose={() => setProfileTarget(null)} onStartDM={onStartDM} />}
     </div>
   );
 }

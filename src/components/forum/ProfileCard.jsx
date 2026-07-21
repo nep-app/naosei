@@ -3,12 +3,15 @@ import { useTranslation } from 'react-i18next';
 import * as Icons from '../../Icons';
 import { Modal } from '../Modal';
 import { getProfile } from '../../data';
+import { useAuth } from '../../contexts/AuthContext';
 
 // Cartão de perfil (público, anónimo) que aparece ao tocar numa alcunha.
-export function ProfileCard({ uid, alias, onClose }) {
+export function ProfileCard({ uid, alias, onClose, onStartDM }) {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const isSelf = user && user.uid === uid;
 
   useEffect(() => {
     let active = true;
@@ -24,6 +27,14 @@ export function ProfileCard({ uid, alias, onClose }) {
         </div>
         <div className="text-lg font-bold text-white">{alias}</div>
       </div>
+      {!isSelf && onStartDM && (
+        <button
+          onClick={() => { onClose(); onStartDM(uid, alias); }}
+          className="w-full mb-4 py-2.5 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 text-white text-sm font-medium hover:from-purple-600 hover:to-blue-600 transition-all inline-flex items-center justify-center gap-2"
+        >
+          <Icons.Send className="w-4 h-4" /> {t('dm.send')}
+        </button>
+      )}
       {loading ? (
         <div className="text-gray-400 text-sm">{t('common.loading')}</div>
       ) : (
