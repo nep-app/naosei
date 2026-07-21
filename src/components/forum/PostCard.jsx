@@ -6,7 +6,7 @@ import { THEME_EMOJI } from '../../constants/themes';
 import { timeAgo } from '../../helpers';
 import { VoteButton } from './VoteButton';
 
-export function PostCard({ post, onOpen, bookmarked, onToggleBookmark }) {
+export function PostCard({ post, onOpen, bookmarked, onToggleBookmark, onOpenProfile }) {
   const { t } = useTranslation();
   const [replyCount, setReplyCount] = useState(0);
 
@@ -56,7 +56,12 @@ export function PostCard({ post, onOpen, bookmarked, onToggleBookmark }) {
         >
           <Icons.Bookmark className="w-4 h-4" filled={bookmarked} />
         </button>
-        <span className="text-xs text-gray-500 ml-auto">— {post.alias}</span>
+        <button
+          onClick={(e) => { e.stopPropagation(); onOpenProfile && onOpenProfile(post.authorUid, post.alias); }}
+          className="text-xs text-gray-500 ml-auto hover:text-purple-300"
+        >
+          — {post.alias}
+        </button>
       </div>
     </div>
   );

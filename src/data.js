@@ -69,6 +69,14 @@ export async function getMyNewReplies(uid, sinceTs) {
 }
 
 // ---------- DENÚNCIAS (moderadores) ----------
+export async function getPost(postId) {
+  const snap = await getDoc(doc(db, 'naosei_forum_posts', postId));
+  return snap.exists() ? { id: snap.id, ...snap.data() } : null;
+}
+export async function getReply(postId, replyId) {
+  const snap = await getDoc(doc(db, 'naosei_forum_posts', postId, 'replies', replyId));
+  return snap.exists() ? { id: snap.id, ...snap.data() } : null;
+}
 export function subscribeReports(cb) {
   const q = query(collection(db, 'naosei_forum_reports'), orderBy('createdAt', 'desc'));
   return onSnapshot(q, (snap) => cb(snap.docs.map((d) => ({ id: d.id, ...d.data() }))));

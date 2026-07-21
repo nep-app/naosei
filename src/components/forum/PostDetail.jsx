@@ -8,7 +8,7 @@ import { timeAgo } from '../../helpers';
 import { VoteButton } from './VoteButton';
 import { ReportButton } from './ReportButton';
 
-export function PostDetail({ post, onBack, showToast }) {
+export function PostDetail({ post, onBack, showToast, onOpenProfile }) {
   const { t } = useTranslation();
   const { user, alias, isModerator } = useAuth();
   const [replies, setReplies] = useState([]);
@@ -134,7 +134,7 @@ export function PostDetail({ post, onBack, showToast }) {
           <div className="flex items-center gap-3 mt-4">
             <VoteButton postId={post.id} />
             {!isOwner && <ReportButton postId={post.id} kind="post" />}
-            <span className="text-xs text-gray-500 ml-auto">— {post.alias}</span>
+            <button onClick={() => onOpenProfile && onOpenProfile(post.authorUid, post.alias)} className="text-xs text-gray-500 ml-auto hover:text-purple-300">— {post.alias}</button>
             {isModerator && (
               <button onClick={togglePin} title={post.pinned ? t('forum.unpin') : t('forum.pin')} className={'p-1 ' + (post.pinned ? 'text-purple-300' : 'text-gray-500 hover:text-purple-300')}>
                 <Icons.Pin className="w-4 h-4" filled={post.pinned} />
@@ -167,7 +167,7 @@ export function PostDetail({ post, onBack, showToast }) {
           {replies.map((r) => (
             <div key={r.id} className="bg-gray-800 rounded-2xl p-4 border border-gray-700/50">
               <div className="flex items-center justify-between mb-1.5">
-                <span className="text-sm font-semibold text-purple-300">{r.alias}</span>
+                <button onClick={() => onOpenProfile && onOpenProfile(r.authorUid, r.alias)} className="text-sm font-semibold text-purple-300 hover:text-purple-200">{r.alias}</button>
                 <span className="text-xs text-gray-500">{timeAgo(r.ts, t)}</span>
               </div>
               <p className="text-sm text-gray-200 whitespace-pre-wrap">{r.body}</p>

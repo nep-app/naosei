@@ -1,13 +1,41 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as Icons from '../Icons';
 import { useAuth } from '../contexts/AuthContext';
+import { getProfile, saveProfile } from '../data';
+import { ReportsPanel } from '../components/forum/ReportsPanel';
 
-export function SettingsView() {
+const REASONS = ['apoio', 'partilhar', 'duvidas', 'ajudar', 'ler'];
+
+export function SettingsView({ showToast }) {
   const { t, i18n } = useTranslation();
-  const { alias, isModerator, logout } = useAuth();
+  const { user, alias, isModerator, logout } = useAuth();
+
+  const [bio, setBio] = useState('');
+  const [reason, setReason] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [showReports, setShowReports] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    getProfile(user.uid).then((p) => {
+      if (p) { setBio(p.bio || ''); setReason(p.reason || ''); }
+    });
+  }, [user]);
 
   const changeLang = (lang) => { i18n.changeLanguage(lang); localStorage.setItem('nep_lang', lang); };
+
+  const saveMyProfile = async () => {
+    setSaving(true);
+    try {
+      await saveProfile(user.uid, { alias, bio, reason });
+      showToast(t('profile.saved'), 'success');
+    } catch {
+      showToast(t('common.error'), 'error');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div>
@@ -25,6 +53,52 @@ export function SettingsView() {
             )}
           </div>
         </div>
+
+        {/* Perfil: bio + o que te traz aqui */}
+        <div className="bg-gray-800 rounded-2xl p-4 border border-gray-700/50 space-y-3">
+          <div className="text-sm font-semibold text-white">{t('profile.title')}</div>
+          <div>
+            <label className="block text-xs text-gray-400 mb-1.5">{t('profile.bioLabel')}</label>
+            <textarea
+              value={bio}
+              onChange={(e) => setBio(e.target.value.slice(0, 300))}
+              rows={2}
+              placeholder={t('profile.bioPlaceholder')}
+              className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-400 mb-1.5">{t('profile.reasonLabel')}</label>
+            <div className="flex flex-wrap gap-2">
+              {REASONS.map((r) => (
+                <button
+                  key={r}
+                  onClick={() => setReason(reason === r ? '' : r)}
+                  className={'px-3 py-1.5 rounded-full text-sm transition-all ' + (reason === r ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600')}
+                >
+                  {t(`reasons.${r}`)}
+                </button>
+              ))}
+            </div>
+          </div>
+          <button
+            onClick={saveMyProfile}
+            disabled={saving}
+            className="w-full py-2.5 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 text-white text-sm font-medium hover:from-purple-600 hover:to-blue-600 transition-all disabled:opacity-60"
+          >
+            {t('profile.save')}
+          </button>
+        </div>
+
+        {/* Painel de denúncias (moderadores) */}
+        {isModerator && (
+          <button
+            onClick={() => setShowReports(true)}
+            className="w-full py-3 rounded-2xl bg-gray-800 border border-gray-700 text-purple-300 font-medium hover:bg-gray-700 transition-colors flex items-center justify-center gap-2"
+          >
+            <Icons.AlertTriangle className="w-5 h-5" /> {t('reports.button')}
+          </button>
+        )}
 
         <div className="bg-gray-800 rounded-2xl p-4 border border-gray-700/50">
           <div className="text-xs text-gray-400 mb-2">{t('settings.language')}</div>
@@ -53,6 +127,8 @@ export function SettingsView() {
 
         <p className="text-xs text-gray-500 text-center pt-2">{t('settings.copyright')}</p>
       </div>
+
+      {showReports && <ReportsPanel onClose={() => setShowReports(false)} showToast={showToast} />}
     </div>
   );
 }

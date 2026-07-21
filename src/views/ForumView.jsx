@@ -8,6 +8,8 @@ import { PostCard } from '../components/forum/PostCard';
 import { PostDetail } from '../components/forum/PostDetail';
 import { NewPostModal } from '../components/forum/NewPostModal';
 import { SafetyBar } from '../components/forum/SafetyBar';
+import { NotificationsButton } from '../components/forum/NotificationsButton';
+import { ProfileCard } from '../components/forum/ProfileCard';
 
 export function ForumView({ showToast }) {
   const { t } = useTranslation();
@@ -19,6 +21,8 @@ export function ForumView({ showToast }) {
   const [search, setSearch] = useState('');
   const [bookmarks, setBookmarks] = useState([]);
   const [savedOnly, setSavedOnly] = useState(false);
+  const [profileTarget, setProfileTarget] = useState(null);
+  const openProfile = (uid, a) => setProfileTarget({ uid, alias: a });
 
   useEffect(() => {
     if (!alias) return;
@@ -57,20 +61,28 @@ export function ForumView({ showToast }) {
 
   if (openPost) {
     const fresh = posts.find((p) => p.id === openPost.id) || openPost;
-    return <PostDetail post={fresh} onBack={() => setOpenPost(null)} showToast={showToast} />;
+    return (
+      <>
+        <PostDetail post={fresh} onBack={() => setOpenPost(null)} showToast={showToast} onOpenProfile={openProfile} />
+        {profileTarget && <ProfileCard uid={profileTarget.uid} alias={profileTarget.alias} onClose={() => setProfileTarget(null)} />}
+      </>
+    );
   }
 
   return (
     <div>
       <header className="mb-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-2">
           <h1 className="text-2xl font-bold text-white">{t('forum.title')}</h1>
-          <button
-            onClick={() => setShowNew(true)}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 text-white text-sm font-medium hover:from-purple-600 hover:to-blue-600 transition-all"
-          >
-            <Icons.Plus className="w-4 h-4" /> {t('forum.newPost')}
-          </button>
+          <div className="flex items-center gap-2">
+            <NotificationsButton onOpenPost={setOpenPost} />
+            <button
+              onClick={() => setShowNew(true)}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 text-white text-sm font-medium hover:from-purple-600 hover:to-blue-600 transition-all"
+            >
+              <Icons.Plus className="w-4 h-4" /> {t('forum.newPost')}
+            </button>
+          </div>
         </div>
         <p className="text-sm text-gray-400 mt-1">{t('forum.subtitle')}</p>
       </header>
@@ -133,12 +145,14 @@ export function ForumView({ showToast }) {
               onOpen={setOpenPost}
               bookmarked={bookmarks.includes(p.id)}
               onToggleBookmark={toggleBookmark}
+              onOpenProfile={openProfile}
             />
           ))}
         </div>
       )}
 
       {showNew && <NewPostModal onClose={() => setShowNew(false)} showToast={showToast} defaultTheme={theme} />}
+      {profileTarget && <ProfileCard uid={profileTarget.uid} alias={profileTarget.alias} onClose={() => setProfileTarget(null)} />}
     </div>
   );
 }
