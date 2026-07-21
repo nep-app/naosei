@@ -28,7 +28,8 @@ function HelpModal({ onClose }) {
   return (
     <Modal title={t('safety.helpTitle')} onClose={onClose}>
       <div className="space-y-3">
-        {['helpEmergency', 'helpHealth', 'helpDrug'].map((k) => (
+        <div className="text-xs text-gray-400">{t('safety.helpRegion')}</div>
+        {['helpEmergency', 'helpHealth'].map((k) => (
           <div key={k} className="bg-gray-900 border border-gray-700 rounded-lg p-3 text-sm text-gray-100 font-medium">
             {t(`safety.${k}`)}
           </div>
@@ -54,6 +55,7 @@ export function SafetyBar() {
         <Icons.Info className="w-4 h-4 text-purple-300 flex-shrink-0 mt-0.5" />
         <div className="flex-1">
           <p className="text-xs text-purple-200">{t('safety.disclaimer')}</p>
+          <p className="text-xs text-amber-200/90 mt-1">{t('safety.publicNote')}</p>
           <div className="flex gap-3 mt-2">
             <button onClick={() => setShowRules(true)} className="text-xs font-medium text-purple-300 hover:text-purple-200 inline-flex items-center gap-1">
               <Icons.Shield className="w-3.5 h-3.5" /> {t('safety.openRules')}

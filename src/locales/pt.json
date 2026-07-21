@@ -10,7 +10,7 @@
     "settings": "Conta"
   },
   "login": {
-    "subtitle": "Entra na comunidade anónima de apoio",
+    "subtitle": "Comunidade de apoio — usas uma alcunha, não o teu nome",
     "aliasLabel": "A tua alcunha (o teu nome no fórum)",
     "aliasPlaceholder": "ex.: Coruja Azul",
     "identifierLabel": "Alcunha (ou email, se criaste a conta com email)",
@@ -37,7 +37,7 @@
     "creating": "A criar conta…",
     "anonNote": "Sem Google. Entras com a alcunha (ou com o email, se puseres um). A alcunha é o teu nome no fórum; o email, se o deres, é privado e nunca aparece a ninguém.",
     "noRecovery": "Guarda bem a palavra-passe: como não há email, não é possível recuperá-la.",
-    "weakPassword": "Usa uma palavra-passe com pelo menos 8 caracteres.",
+    "weakPassword": "Usa uma palavra-passe forte, com pelo menos 12 caracteres.",
     "aliasInvalid": "A alcunha tem de ter pelo menos 2 letras ou números.",
     "errWrongPassword": "Palavra-passe errada.",
     "errUserNotFound": "Não existe conta com essa alcunha.",
@@ -88,7 +88,7 @@
   },
   "forum": {
     "title": "Comunidade",
-    "subtitle": "Espaço anónimo. Ninguém vê quem tu és — só a tua alcunha.",
+    "subtitle": "Usas uma alcunha, não o teu nome. Mas nenhum sítio online é 100% anónimo — não partilhes dados que te identifiquem.",
     "chooseAliasTitle": "Escolhe a tua alcunha",
     "chooseAliasText": "É este o nome que os outros vão ver no fórum. Não uses o teu nome verdadeiro.",
     "aliasPlaceholder": "ex.: Coruja Azul",
@@ -163,6 +163,7 @@
   },
   "safety": {
     "disclaimer": "Partilha entre pares — não é aconselhamento médico.",
+    "publicNote": "⚠️ O que escreves aqui é público — outras pessoas veem. (Ao contrário do teu diário privado na app.)",
     "rulesTitle": "Regras da comunidade",
     "rulesIntro": "Este é um espaço de apoio e redução de danos. Ao participar, concordas com:",
     "rule1": "Respeito. Sem ataques, julgamentos ou ódio.",
@@ -172,9 +173,9 @@
     "rule5": "Informação partilhada é experiência pessoal — confirma sempre em fontes fiáveis.",
     "agree": "Li e concordo",
     "helpTitle": "Precisas de ajuda agora?",
+    "helpRegion": "Recursos de Portugal 🇵🇹",
     "helpEmergency": "Emergência (24h): 112",
     "helpHealth": "SNS 24 (saúde): 808 24 24 24",
-    "helpDrug": "Linha Vida – SICAD (apoio sobre consumos): 1414",
     "helpNote": "Se estiveres em perigo imediato, liga 112.",
     "openRules": "Ver regras",
     "openHelp": "Ajuda / crise"
@@ -233,7 +234,7 @@
     "language": "Língua",
     "signOut": "Terminar sessão",
     "privacyTitle": "A tua privacidade",
-    "privacyText": "No fórum apareces sempre com a tua alcunha, nunca com o teu email ou nome real. Ninguém consegue ligar as mensagens a ti.",
+    "privacyText": "No fórum apareces com a tua alcunha, não com o teu nome ou email. Mas lembra-te: nenhum espaço online é totalmente anónimo (fica rasto do IP, o modo de escrever pode identificar). Evita partilhar dados que te identifiquem — nome, morada, sítios.",
     "copyright": "NEP · Redução de danos, sem julgamento."
   },
   "common": {

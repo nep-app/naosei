@@ -35,7 +35,7 @@ export function LoginScreen() {
     setError(''); setInfo('');
     if (!isLogin) {
       if (!aliasIsValid(identifier)) { setError(t('login.aliasInvalid')); return; }
-      if (password.length < 8) { setError(t('login.weakPassword')); return; }
+      if (password.length < 12) { setError(t('login.weakPassword')); return; }
       if (password !== confirm) { setError(t('login.confirmMismatch')); return; }
     }
     setLoading(true);
@@ -112,7 +112,7 @@ export function LoginScreen() {
               className="w-full px-4 py-3 bg-gray-800 border-2 border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               required
               disabled={loading}
-              minLength={8}
+              minLength={isLogin ? 1 : 12}
             />
           </div>
 
@@ -136,7 +136,7 @@ export function LoginScreen() {
                   className="w-full px-4 py-3 bg-gray-800 border-2 border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   required
                   disabled={loading}
-                  minLength={8}
+                  minLength={12}
                 />
               </div>
               <div>

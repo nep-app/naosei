@@ -10,7 +10,7 @@
     "settings": "Account"
   },
   "login": {
-    "subtitle": "Sign in to the anonymous support community",
+    "subtitle": "Support community — you use an alias, not your real name",
     "aliasLabel": "Your alias (your name in the forum)",
     "aliasPlaceholder": "e.g. Blue Owl",
     "identifierLabel": "Alias (or email, if you created the account with email)",
@@ -37,7 +37,7 @@
     "creating": "Creating account…",
     "anonNote": "No Google. You sign in with your alias (or with your email, if you add one). Your alias is your name in the forum; the email, if you give one, is private and never shown to anyone.",
     "noRecovery": "Keep your password safe: since there's no email, it can't be recovered.",
-    "weakPassword": "Use a password with at least 8 characters.",
+    "weakPassword": "Use a strong password, at least 12 characters.",
     "aliasInvalid": "The alias needs at least 2 letters or numbers.",
     "errWrongPassword": "Wrong password.",
     "errUserNotFound": "No account with that alias.",
@@ -88,7 +88,7 @@
   },
   "forum": {
     "title": "Community",
-    "subtitle": "Anonymous space. Nobody sees who you are — only your alias.",
+    "subtitle": "You use an alias, not your real name. But no online space is 100% anonymous — don't share details that identify you.",
     "chooseAliasTitle": "Choose your alias",
     "chooseAliasText": "This is the name others will see in the forum. Don't use your real name.",
     "aliasPlaceholder": "e.g. Blue Owl",
@@ -163,6 +163,7 @@
   },
   "safety": {
     "disclaimer": "Peer sharing — not medical advice.",
+    "publicNote": "⚠️ What you write here is public — other people can see it. (Unlike your private journal in the app.)",
     "rulesTitle": "Community rules",
     "rulesIntro": "This is a space for support and harm reduction. By taking part, you agree to:",
     "rule1": "Respect. No attacks, judgement or hate.",
@@ -172,9 +173,9 @@
     "rule5": "Shared info is personal experience — always double-check reliable sources.",
     "agree": "I've read and agree",
     "helpTitle": "Need help now?",
+    "helpRegion": "Resources for Portugal 🇵🇹",
     "helpEmergency": "Emergency (24h): 112",
     "helpHealth": "SNS 24 (health line): 808 24 24 24",
-    "helpDrug": "Linha Vida – SICAD (drug support): 1414",
     "helpNote": "If you're in immediate danger, call 112.",
     "openRules": "See rules",
     "openHelp": "Help / crisis"
@@ -233,7 +234,7 @@
     "language": "Language",
     "signOut": "Sign out",
     "privacyTitle": "Your privacy",
-    "privacyText": "In the forum you always appear as your alias, never your email or real name. Nobody can link the messages back to you.",
+    "privacyText": "In the forum you appear as your alias, not your name or email. But remember: no online space is fully anonymous (your IP leaves a trace, writing style can identify you). Avoid sharing details that identify you — name, address, places.",
     "copyright": "NEP · Harm reduction, no judgement."
   },
   "common": {
