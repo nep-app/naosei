@@ -4,16 +4,22 @@ import * as Icons from '../../Icons';
 import { useAuth } from '../../contexts/AuthContext';
 import { subscribeReplies, addReply, deletePost, deleteReply, updatePost, setPostPinned } from '../../data';
 import { THEME_EMOJI } from '../../constants/themes';
-import { timeAgo } from '../../helpers';
+import { formatDateLabel } from '../../helpers';
 import { VoteButton } from './VoteButton';
 import { ReportButton } from './ReportButton';
 
 export function PostDetail({ post, onBack, showToast, onOpenProfile }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user, alias, isModerator } = useAuth();
   const [replies, setReplies] = useState([]);
+  const [voteCounts, setVoteCounts] = useState({});
   const [text, setText] = useState('');
   const [sending, setSending] = useState(false);
+
+  // Respostas mais apoiadas primeiro; empate → mais antiga primeiro.
+  const sortedReplies = [...replies].sort(
+    (a, b) => (voteCounts[b.id] || 0) - (voteCounts[a.id] || 0) || (a.ts || 0) - (b.ts || 0)
+  );
   const [editing, setEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(post.title);
   const [editBody, setEditBody] = useState(post.body);
@@ -96,7 +102,7 @@ export function PostDetail({ post, onBack, showToast, onOpenProfile }) {
               <Icons.HelpCircle className="w-3 h-3" /> {t('forum.question')}
             </span>
           )}
-          <span className="text-xs text-gray-500 ml-auto">{timeAgo(post.ts, t)}</span>
+          <span className="text-xs text-gray-500 ml-auto">{formatDateLabel(post.ts, i18n.language)}</span>
         </div>
         {editing ? (
           <div className="mt-2 space-y-2">
@@ -164,15 +170,15 @@ export function PostDetail({ post, onBack, showToast, onOpenProfile }) {
         </div>
       ) : (
         <div className="space-y-3 mb-4">
-          {replies.map((r) => (
+          {sortedReplies.map((r) => (
             <div key={r.id} className="bg-gray-800 rounded-2xl p-4 border border-gray-700/50">
               <div className="flex items-center justify-between mb-1.5">
                 <button onClick={() => onOpenProfile && onOpenProfile(r.authorUid, r.alias)} className="text-sm font-semibold text-purple-300 hover:text-purple-200">{r.alias}</button>
-                <span className="text-xs text-gray-500">{timeAgo(r.ts, t)}</span>
+                <span className="text-xs text-gray-500">{formatDateLabel(r.ts, i18n.language)}</span>
               </div>
               <p className="text-sm text-gray-200 whitespace-pre-wrap">{r.body}</p>
               <div className="mt-2 flex items-center gap-3">
-                <VoteButton postId={r.id} size="sm" />
+                <VoteButton postId={r.id} size="sm" onCount={(n) => setVoteCounts((m) => (m[r.id] === n ? m : { ...m, [r.id]: n }))} />
                 <div className="ml-auto flex items-center gap-3">
                   {r.authorUid !== user.uid && (
                     <ReportButton postId={post.id} replyId={r.id} kind="reply" />

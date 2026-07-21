@@ -20,7 +20,7 @@ export function currentTimeHHMM() {
 export function formatDateLabel(ts, lang) {
   try {
     return new Date(ts).toLocaleDateString(lang === 'en' ? 'en-GB' : 'pt-PT', {
-      day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit',
+      day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit',
     });
   } catch {
     return '';

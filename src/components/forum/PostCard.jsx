@@ -3,11 +3,11 @@ import { useTranslation } from 'react-i18next';
 import * as Icons from '../../Icons';
 import { subscribeReplies } from '../../data';
 import { THEME_EMOJI } from '../../constants/themes';
-import { timeAgo } from '../../helpers';
+import { formatDateLabel } from '../../helpers';
 import { VoteButton } from './VoteButton';
 
 export function PostCard({ post, onOpen, bookmarked, onToggleBookmark, onOpenProfile }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [replyCount, setReplyCount] = useState(0);
 
   useEffect(() => {
@@ -37,7 +37,7 @@ export function PostCard({ post, onOpen, bookmarked, onToggleBookmark, onOpenPro
             <Icons.HelpCircle className="w-3 h-3" /> {t('forum.question')}
           </span>
         )}
-        <span className="text-xs text-gray-500 ml-auto">{timeAgo(post.ts, t)}</span>
+        <span className="text-xs text-gray-500 ml-auto">{formatDateLabel(post.ts, i18n.language)}</span>
       </div>
 
       <h3 className="text-white font-semibold leading-snug">{post.title}</h3>

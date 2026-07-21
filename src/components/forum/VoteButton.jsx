@@ -1,21 +1,25 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as Icons from '../../Icons';
 import { useAuth } from '../../contexts/AuthContext';
 import { subscribeVotes, toggleVote } from '../../data';
 
 // Botão de "apoio" (voto positivo). Mostra a contagem e se a pessoa já apoiou.
-export function VoteButton({ postId, size = 'md' }) {
+// onCount (opcional) informa o componente-pai da contagem (para ordenar respostas).
+export function VoteButton({ postId, size = 'md', onCount }) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [count, setCount] = useState(0);
   const [voted, setVoted] = useState(false);
   const [busy, setBusy] = useState(false);
+  const onCountRef = useRef(onCount);
+  onCountRef.current = onCount;
 
   useEffect(() => {
     const unsub = subscribeVotes(postId, (n, ids) => {
       setCount(n);
       setVoted(ids.includes(`${postId}__${user.uid}`));
+      if (onCountRef.current) onCountRef.current(n);
     });
     return unsub;
   }, [postId, user.uid]);
