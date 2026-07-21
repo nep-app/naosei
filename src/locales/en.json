@@ -190,7 +190,9 @@
     "save": "Save profile",
     "saved": "Profile saved.",
     "viewTitle": "Profile",
-    "noBio": "No bio yet."
+    "noBio": "No bio yet.",
+    "karmaLabel": "Support received",
+    "karmaPrivate": "Only you can see this number. Nobody sees it in the forum."
   },
   "reasons": {
     "apoio": "Support",

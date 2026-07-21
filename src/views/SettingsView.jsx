@@ -20,6 +20,7 @@ export function SettingsView({ showToast }) {
   const [roaOther, setRoaOther] = useState('');
   const [saving, setSaving] = useState(false);
   const [showReports, setShowReports] = useState(false);
+  const [karma, setKarma] = useState(null);
 
   useEffect(() => {
     if (!user) return;
@@ -31,8 +32,8 @@ export function SettingsView({ showToast }) {
         setRoaSel(p.roa || []); setRoaOther(p.roaOther || '');
       }
     });
-    // Recalcula o karma (apoios recebidos) em segundo plano, para o "Em destaque".
-    computeMyKarma(user.uid);
+    // Recalcula o karma (apoios recebidos) — mostrado só aqui, à própria pessoa.
+    computeMyKarma(user.uid).then(setKarma);
   }, [user]);
 
   const toggle = (list, setList, key) =>
@@ -68,6 +69,20 @@ export function SettingsView({ showToast }) {
             )}
           </div>
         </div>
+
+        {/* Karma — privado, só a própria pessoa vê */}
+        {karma !== null && (
+          <div className="bg-gray-800 rounded-2xl p-4 border border-gray-700/50 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-purple-500/20 text-purple-300 flex items-center justify-center">
+              <Icons.Heart className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="text-xs text-gray-400">{t('profile.karmaLabel')}</div>
+              <div className="text-white font-bold text-lg leading-tight">{karma}</div>
+              <div className="text-[11px] text-gray-500">{t('profile.karmaPrivate')}</div>
+            </div>
+          </div>
+        )}
 
         {/* Perfil: bio + o que te traz aqui */}
         <div className="bg-gray-800 rounded-2xl p-4 border border-gray-700/50 space-y-3">
