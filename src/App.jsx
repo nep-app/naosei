@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as Icons from './Icons';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { subscribeConversations, subscribeDmReads } from './data';
 import { LoginScreen } from './components/LoginScreen';
 import { ForumView } from './views/ForumView';
 import { MessagesView } from './views/MessagesView';
@@ -32,8 +33,22 @@ function Shell() {
   const [view, setView] = useState('forum');
   const [toasts, setToasts] = useState([]);
   const [dmTarget, setDmTarget] = useState(null);
+  const [convs, setConvs] = useState([]);
+  const [dmReads, setDmReads] = useState({});
 
   const startDM = (uid, alias) => { setDmTarget({ uid, alias }); setView('messages'); };
+
+  useEffect(() => {
+    if (!user) return;
+    const u1 = subscribeConversations(user.uid, setConvs);
+    const u2 = subscribeDmReads(user.uid, setDmReads);
+    return () => { u1(); u2(); };
+  }, [user]);
+
+  // Conversas com mensagem nova (o outro escreveu depois de eu ter lido).
+  const unreadDM = user
+    ? convs.filter((c) => c.lastSender && c.lastSender !== user.uid && (c.lastTs || 0) > (dmReads[c.id] || 0)).length
+    : 0;
 
   const showToast = (message, type = 'success') => {
     const id = `${Date.now()}-${Math.floor(Math.random() * 1000)}`;
@@ -81,7 +96,14 @@ function Shell() {
                   (view === key ? 'bg-purple-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600')
                 }
               >
-                <Icon className="w-5 h-5" />
+                <div className="relative">
+                  <Icon className="w-5 h-5" />
+                  {key === 'messages' && unreadDM > 0 && (
+                    <span className="absolute -top-1.5 -right-2 min-w-[16px] h-4 px-1 rounded-full bg-purple-500 text-white text-[10px] font-bold flex items-center justify-center border border-gray-800">
+                      {unreadDM > 9 ? '9+' : unreadDM}
+                    </span>
+                  )}
+                </div>
                 <div className="text-xs font-medium mt-1">{label}</div>
               </button>
             ))}

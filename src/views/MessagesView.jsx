@@ -4,7 +4,7 @@ import * as Icons from '../Icons';
 import { useAuth } from '../contexts/AuthContext';
 import {
   startConversation, subscribeConversations, subscribeMessages, sendMessage,
-  subscribeBlocks, blockUser, unblockUser, reportUser,
+  subscribeBlocks, blockUser, unblockUser, reportUser, markConvRead,
 } from '../data';
 import { timeAgo, formatDateLabel } from '../helpers';
 
@@ -53,6 +53,11 @@ export function MessagesView({ dmTarget, onConsumeDmTarget, showToast }) {
     const unsub = subscribeMessages(openId, setMessages);
     return unsub;
   }, [openId]);
+
+  // Enquanto a conversa está aberta, marca-a como lida (limpa o contador).
+  useEffect(() => {
+    if (openId && user) markConvRead(user.uid, openId);
+  }, [openId, messages, user]);
 
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
 

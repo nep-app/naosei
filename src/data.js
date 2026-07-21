@@ -118,6 +118,18 @@ export async function sendMessage(convId, senderUid, senderAlias, body) {
   });
 }
 
+// "Lido" por conversa (privado do dono) — para o contador de não lidas.
+export function subscribeDmReads(uid, cb) {
+  return onSnapshot(collection(db, 'naosei_users', uid, 'dm_reads'), (snap) => {
+    const m = {};
+    snap.docs.forEach((d) => { m[d.id] = d.data().ts || 0; });
+    cb(m);
+  });
+}
+export function markConvRead(uid, convId) {
+  return setDoc(doc(db, 'naosei_users', uid, 'dm_reads', convId), { ts: Date.now() });
+}
+
 // Bloqueios (privado do dono). Bloquear alguém impede-o de te escrever (regras).
 export function subscribeBlocks(uid, cb) {
   return onSnapshot(collection(db, 'naosei_users', uid, 'blocks'), (snap) => cb(snap.docs.map((d) => d.id)));
