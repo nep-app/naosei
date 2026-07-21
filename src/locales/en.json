@@ -221,9 +221,13 @@
   },
   "otherPlaceholder": "Which one? Type here.",
   "notif": {
-    "title": "Replies to your posts",
-    "empty": "Nothing new. When someone replies to your posts, it shows up here.",
-    "repliedTo": "replied to"
+    "title": "Notifications",
+    "empty": "Nothing new. When someone replies, supports or saves something of yours, it shows up here.",
+    "reply": "{{alias}} replied to your post “{{title}}”",
+    "like": "{{alias}} supported {{what}}",
+    "save": "Someone saved your post “{{title}}”",
+    "whatPost": "your post",
+    "whatReply": "your comment"
   },
   "reports": {
     "title": "Reports",

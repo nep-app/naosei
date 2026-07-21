@@ -221,9 +221,13 @@
   },
   "otherPlaceholder": "Qual? Escreve aqui.",
   "notif": {
-    "title": "Respostas aos teus posts",
-    "empty": "Sem novidades. Quando alguém responder aos teus posts, aparece aqui.",
-    "repliedTo": "respondeu a"
+    "title": "Avisos",
+    "empty": "Sem novidades. Quando alguém responder, apoiar ou guardar algo teu, aparece aqui.",
+    "reply": "{{alias}} respondeu à tua publicação «{{title}}»",
+    "like": "{{alias}} apoiou {{what}}",
+    "save": "Alguém guardou a tua publicação «{{title}}»",
+    "whatPost": "a tua publicação",
+    "whatReply": "o teu comentário"
   },
   "reports": {
     "title": "Denúncias",

@@ -44,13 +44,13 @@ export function PostCard({ post, onOpen, bookmarked, onToggleBookmark, onOpenPro
       <p className="text-sm text-gray-400 mt-1 line-clamp-2">{post.body}</p>
 
       <div className="flex items-center gap-3 mt-3">
-        <VoteButton postId={post.id} size="sm" />
+        <VoteButton postId={post.id} size="sm" activity={{ forUid: post.authorUid, targetKind: 'post', targetId: post.id, targetTitle: post.title }} />
         <span className="text-xs text-gray-400 inline-flex items-center gap-1">
           <Icons.MessageSquare className="w-3.5 h-3.5" />
           {replyCount}
         </span>
         <button
-          onClick={(e) => { e.stopPropagation(); onToggleBookmark(post.id); }}
+          onClick={(e) => { e.stopPropagation(); onToggleBookmark(post); }}
           className={'p-1 rounded-md transition-colors ' + (bookmarked ? 'text-purple-300' : 'text-gray-500 hover:text-gray-300')}
           title={bookmarked ? t('forum.unsave') : t('forum.save')}
         >

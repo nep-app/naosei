@@ -92,6 +92,15 @@ service cloud.firestore {
       allow update: if false;
     }
 
+    // ---- Avisos / notificações (atividade) ----
+    // Cada evento é dirigido ao dono do conteúdo (forUid) e só ele o lê.
+    // Quem cria tem de ser o próprio ator (actorUid). "Guardar" não revela a alcunha.
+    match /naosei_activity/{id} {
+      allow create: if isSignedIn() && request.resource.data.actorUid == request.auth.uid;
+      allow read, delete: if isSignedIn() && resource.data.forUid == request.auth.uid;
+      allow update: if false;
+    }
+
     // ---- Mensagens privadas (DMs) ----
     // Só os 2 participantes leem/escrevem. Bloquear alguém impede-o de te escrever.
     match /naosei_dms/{convId} {

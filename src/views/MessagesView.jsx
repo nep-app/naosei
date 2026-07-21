@@ -6,7 +6,7 @@ import {
   startConversation, subscribeConversations, subscribeMessages, sendMessage,
   subscribeBlocks, blockUser, unblockUser, reportUser,
 } from '../data';
-import { timeAgo } from '../helpers';
+import { timeAgo, formatDateLabel } from '../helpers';
 
 function other(conv, uid) {
   const oid = (conv.participants || []).find((p) => p !== uid) || uid;
@@ -14,7 +14,7 @@ function other(conv, uid) {
 }
 
 export function MessagesView({ dmTarget, onConsumeDmTarget, showToast }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user, alias } = useAuth();
   const [convs, setConvs] = useState([]);
   const [blocks, setBlocks] = useState([]);
@@ -114,7 +114,7 @@ export function MessagesView({ dmTarget, onConsumeDmTarget, showToast }) {
               <div key={m.id} className={'flex ' + (mine ? 'justify-end' : 'justify-start')}>
                 <div className={'max-w-[80%] rounded-2xl px-3 py-2 text-sm ' + (mine ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white' : 'bg-gray-800 text-gray-100 border border-gray-700')}>
                   <p className="whitespace-pre-wrap">{m.body}</p>
-                  <div className={'text-[10px] mt-1 ' + (mine ? 'text-white/70' : 'text-gray-500')}>{timeAgo(m.ts, t)}</div>
+                  <div className={'text-[10px] mt-1 ' + (mine ? 'text-white/70' : 'text-gray-500')}>{formatDateLabel(m.ts, i18n.language)}</div>
                 </div>
               </div>
             );

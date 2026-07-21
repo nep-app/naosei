@@ -138,6 +138,33 @@ export function reportUser(reporterUid, { reportedUid, convId, sample }) {
   });
 }
 
+// ---------- AVISOS / NOTIFICAÇÕES (caixa de atividade) ----------
+// Cada evento é dirigido a uma pessoa (forUid = dono do conteúdo). Só o dono lê.
+// Para "guardar", NÃO guardamos a alcunha de quem guardou (fica anónimo).
+export function addActivity(actorUid, actorAlias, { forUid, type, targetKind, targetId, targetTitle }) {
+  if (!forUid || forUid === actorUid) return Promise.resolve(); // não te avisas a ti própria
+  return addDoc(collection(db, 'naosei_activity'), {
+    forUid,
+    actorUid,
+    actorAlias: type === 'save' ? '' : (actorAlias || ''), // 'guardar' é anónimo
+    type, // 'reply' | 'like' | 'save'
+    targetKind: targetKind || 'post',
+    targetId: targetId || '',
+    targetTitle: (targetTitle || '').slice(0, 120),
+    ts: Date.now(),
+    createdAt: serverTimestamp(),
+  });
+}
+
+export function subscribeActivity(uid, cb) {
+  const q = query(
+    collection(db, 'naosei_activity'),
+    where('forUid', '==', uid),
+    orderBy('ts', 'desc')
+  );
+  return onSnapshot(q, (snap) => cb(snap.docs.map((d) => ({ id: d.id, ...d.data() }))));
+}
+
 // ---------- DENÚNCIAS (moderadores) ----------
 export async function getPost(postId) {
   const snap = await getDoc(doc(db, 'naosei_forum_posts', postId));

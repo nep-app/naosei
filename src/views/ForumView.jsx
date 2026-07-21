@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as Icons from '../Icons';
 import { useAuth } from '../contexts/AuthContext';
-import { subscribePosts, subscribeBookmarks, addBookmark, removeBookmark } from '../data';
+import { subscribePosts, subscribeBookmarks, addBookmark, removeBookmark, addActivity } from '../data';
 import { FORUM_THEMES, THEME_EMOJI } from '../constants/themes';
 import { PostCard } from '../components/forum/PostCard';
 import { PostDetail } from '../components/forum/PostDetail';
@@ -36,9 +36,14 @@ export function ForumView({ showToast, onStartDM }) {
     return unsub;
   }, [user]);
 
-  const toggleBookmark = (postId) => {
-    if (bookmarks.includes(postId)) removeBookmark(user.uid, postId);
-    else addBookmark(user.uid, postId);
+  const toggleBookmark = (post) => {
+    if (bookmarks.includes(post.id)) {
+      removeBookmark(user.uid, post.id);
+    } else {
+      addBookmark(user.uid, post.id);
+      // Avisa o autor (anónimo: sem dizer quem guardou).
+      addActivity(user.uid, alias, { forUid: post.authorUid, type: 'save', targetKind: 'post', targetId: post.id, targetTitle: post.title });
+    }
   };
 
   // Ordena (fixados primeiro), filtra por pesquisa e por "guardados".

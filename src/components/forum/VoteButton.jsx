@@ -2,13 +2,14 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as Icons from '../../Icons';
 import { useAuth } from '../../contexts/AuthContext';
-import { subscribeVotes, toggleVote } from '../../data';
+import { subscribeVotes, toggleVote, addActivity } from '../../data';
 
 // Botão de "apoio" (voto positivo). Mostra a contagem e se a pessoa já apoiou.
 // onCount (opcional) informa o componente-pai da contagem (para ordenar respostas).
-export function VoteButton({ postId, size = 'md', onCount }) {
+// activity (opcional): { forUid, targetKind, targetId, targetTitle } para avisar o autor.
+export function VoteButton({ postId, size = 'md', onCount, activity }) {
   const { t } = useTranslation();
-  const { user } = useAuth();
+  const { user, alias } = useAuth();
   const [count, setCount] = useState(0);
   const [voted, setVoted] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -29,7 +30,10 @@ export function VoteButton({ postId, size = 'md', onCount }) {
     if (busy) return;
     setBusy(true);
     try {
-      await toggleVote(postId, user.uid);
+      const added = await toggleVote(postId, user.uid);
+      if (added && activity) {
+        addActivity(user.uid, alias, { forUid: activity.forUid, type: 'like', ...activity });
+      }
     } finally {
       setBusy(false);
     }

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as Icons from '../../Icons';
 import { useAuth } from '../../contexts/AuthContext';
-import { subscribeReplies, addReply, deletePost, deleteReply, updatePost, setPostPinned } from '../../data';
+import { subscribeReplies, addReply, deletePost, deleteReply, updatePost, setPostPinned, addActivity } from '../../data';
 import { THEME_EMOJI } from '../../constants/themes';
 import { formatDateLabel } from '../../helpers';
 import { VoteButton } from './VoteButton';
@@ -52,6 +52,7 @@ export function PostDetail({ post, onBack, showToast, onOpenProfile }) {
     setSending(true);
     try {
       await addReply(post.id, user.uid, alias, text);
+      addActivity(user.uid, alias, { forUid: post.authorUid, type: 'reply', targetKind: 'post', targetId: post.id, targetTitle: post.title });
       setText('');
     } catch {
       showToast(t('common.error'), 'error');
@@ -138,7 +139,7 @@ export function PostDetail({ post, onBack, showToast, onOpenProfile }) {
 
         {!editing && (
           <div className="flex items-center gap-3 mt-4">
-            <VoteButton postId={post.id} />
+            <VoteButton postId={post.id} activity={{ forUid: post.authorUid, targetKind: 'post', targetId: post.id, targetTitle: post.title }} />
             {!isOwner && <ReportButton postId={post.id} kind="post" />}
             <button onClick={() => onOpenProfile && onOpenProfile(post.authorUid, post.alias)} className="text-xs text-gray-500 ml-auto hover:text-purple-300">— {post.alias}</button>
             {isModerator && (
@@ -178,7 +179,7 @@ export function PostDetail({ post, onBack, showToast, onOpenProfile }) {
               </div>
               <p className="text-sm text-gray-200 whitespace-pre-wrap">{r.body}</p>
               <div className="mt-2 flex items-center gap-3">
-                <VoteButton postId={r.id} size="sm" onCount={(n) => setVoteCounts((m) => (m[r.id] === n ? m : { ...m, [r.id]: n }))} />
+                <VoteButton postId={r.id} size="sm" onCount={(n) => setVoteCounts((m) => (m[r.id] === n ? m : { ...m, [r.id]: n }))} activity={{ forUid: r.authorUid, targetKind: 'reply', targetId: r.id, targetTitle: post.title }} />
                 <div className="ml-auto flex items-center gap-3">
                   {r.authorUid !== user.uid && (
                     <ReportButton postId={post.id} replyId={r.id} kind="reply" />
