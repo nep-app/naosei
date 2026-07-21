@@ -13,9 +13,11 @@ export function SettingsView({ showToast }) {
   const { user, alias, isModerator, logout } = useAuth();
 
   const [bio, setBio] = useState('');
-  const [reason, setReason] = useState('');
+  const [reasonsSel, setReasonsSel] = useState([]);
   const [docSel, setDocSel] = useState([]);
+  const [docOther, setDocOther] = useState('');
   const [roaSel, setRoaSel] = useState([]);
+  const [roaOther, setRoaOther] = useState('');
   const [saving, setSaving] = useState(false);
   const [showReports, setShowReports] = useState(false);
 
@@ -23,8 +25,10 @@ export function SettingsView({ showToast }) {
     if (!user) return;
     getProfile(user.uid).then((p) => {
       if (p) {
-        setBio(p.bio || ''); setReason(p.reason || '');
-        setDocSel(p.doc || []); setRoaSel(p.roa || []);
+        setBio(p.bio || '');
+        setReasonsSel(p.reasons || (p.reason ? [p.reason] : []));
+        setDocSel(p.doc || []); setDocOther(p.docOther || '');
+        setRoaSel(p.roa || []); setRoaOther(p.roaOther || '');
       }
     });
   }, [user]);
@@ -37,7 +41,7 @@ export function SettingsView({ showToast }) {
   const saveMyProfile = async () => {
     setSaving(true);
     try {
-      await saveProfile(user.uid, { alias, bio, reason, doc: docSel, roa: roaSel });
+      await saveProfile(user.uid, { alias, bio, reasons: reasonsSel, doc: docSel, docOther, roa: roaSel, roaOther });
       showToast(t('profile.saved'), 'success');
     } catch {
       showToast(t('common.error'), 'error');
@@ -82,8 +86,8 @@ export function SettingsView({ showToast }) {
               {REASONS.map((r) => (
                 <button
                   key={r}
-                  onClick={() => setReason(reason === r ? '' : r)}
-                  className={'px-3 py-1.5 rounded-full text-sm transition-all ' + (reason === r ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600')}
+                  onClick={() => toggle(reasonsSel, setReasonsSel, r)}
+                  className={'px-3 py-1.5 rounded-full text-sm transition-all ' + (reasonsSel.includes(r) ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600')}
                 >
                   {t(`reasons.${r}`)}
                 </button>
@@ -103,6 +107,14 @@ export function SettingsView({ showToast }) {
                 </button>
               ))}
             </div>
+            {docSel.includes('outra') && (
+              <input
+                value={docOther}
+                onChange={(e) => setDocOther(e.target.value.slice(0, 40))}
+                placeholder={t('otherPlaceholder')}
+                className="w-full mt-2 px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+            )}
           </div>
           <div>
             <label className="block text-xs text-gray-400 mb-1.5">{t('roa.label')}</label>
@@ -117,6 +129,14 @@ export function SettingsView({ showToast }) {
                 </button>
               ))}
             </div>
+            {roaSel.includes('outra') && (
+              <input
+                value={roaOther}
+                onChange={(e) => setRoaOther(e.target.value.slice(0, 40))}
+                placeholder={t('otherPlaceholder')}
+                className="w-full mt-2 px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+            )}
           </div>
           <button
             onClick={saveMyProfile}

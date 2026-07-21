@@ -3,11 +3,17 @@
 
 // Substância(s) de eleição (Drug of Choice)
 export const DOC_OPTIONS = [
-  'mdma', 'cocaina', 'cannabis', 'ketamina', 'lsd', 'cogumelos',
-  'anfetaminas', 'alcool', 'opioides', 'benzo', 'ghb', '2cb', 'tabaco', 'outra',
+  'mdma', 'cocaina', 'crack', 'anfetaminas', 'metanfetamina',
+  'cannabis', 'canabinoides', 'ketamina', 'lsd', 'cogumelos',
+  'dmt', '2cb', 'nbome', 'mescalina', 'ghb',
+  'opioides', 'heroina', 'benzo', 'catinonas', 'nps',
+  'poppers', 'nitroso', 'salvia', 'alcool', 'tabaco', 'outra',
 ];
 
 // Via(s) de administração (Route of Administration)
 export const ROA_OPTIONS = [
   'oral', 'sublingual', 'insuflado', 'fumado', 'vaporizado', 'injetado', 'retal', 'outra',
 ];
+
+// Motivos ("o que te traz aqui") — escolha múltipla
+export const REASON_OPTIONS = ['apoio', 'partilhar', 'duvidas', 'ajudar', 'ler'];

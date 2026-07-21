@@ -185,7 +185,7 @@
     "edit": "Editar perfil",
     "bioLabel": "Bio (uma frase sobre ti, sem te identificares)",
     "bioPlaceholder": "ex.: A tentar gerir melhor os meus dias.",
-    "reasonLabel": "O que te traz aqui?",
+    "reasonLabel": "O que te traz aqui? (podes escolher várias)",
     "reasonNone": "Prefiro não dizer",
     "save": "Guardar perfil",
     "saved": "Perfil guardado.",
@@ -200,18 +200,26 @@
     "ler": "Só ler"
   },
   "doc": {
-    "label": "Substância(s) de eleição (DOC)",
-    "mdma": "MDMA", "cocaina": "Cocaína", "cannabis": "Canábis", "ketamina": "Ketamina",
-    "lsd": "LSD", "cogumelos": "Cogumelos", "anfetaminas": "Anfetaminas/Speed",
-    "alcool": "Álcool", "opioides": "Opióides", "benzo": "Benzodiazepinas",
-    "ghb": "GHB/GBL", "2cb": "2C-B", "tabaco": "Tabaco", "outra": "Outra"
+    "label": "Substância(s) de eleição — DOC (podes escolher várias)",
+    "mdma": "MDMA", "cocaina": "Cocaína", "crack": "Crack",
+    "anfetaminas": "Anfetaminas/Speed", "metanfetamina": "Metanfetamina",
+    "cannabis": "Canábis", "canabinoides": "Canabinóides sintéticos",
+    "ketamina": "Ketamina", "lsd": "LSD", "cogumelos": "Cogumelos",
+    "dmt": "DMT", "2cb": "2C-B", "nbome": "NBOMe", "mescalina": "Mescalina",
+    "ghb": "GHB/GBL", "opioides": "Opióides", "heroina": "Heroína",
+    "benzo": "Benzodiazepinas", "catinonas": "Catinonas sintéticas",
+    "nps": "NPS (novas substâncias)", "poppers": "Poppers",
+    "nitroso": "Óxido nitroso (balões)", "salvia": "Salvia",
+    "alcool": "Álcool", "tabaco": "Tabaco", "outra": "Outra"
   },
   "roa": {
-    "label": "Via(s) de administração (ROA)",
-    "oral": "Oral", "sublingual": "Sublingual", "insuflado": "Insuflado",
-    "fumado": "Fumado", "vaporizado": "Vaporizado", "injetado": "Injetado",
-    "retal": "Retal", "outra": "Outra"
+    "label": "Via(s) de administração — ROA (podes escolher várias)",
+    "oral": "Oral (engolir)", "sublingual": "Sublingual (debaixo da língua)",
+    "insuflado": "Insuflado (snifar, pelo nariz)", "fumado": "Fumado",
+    "vaporizado": "Vaporizado (vape)", "injetado": "Injetado (na veia)",
+    "retal": "Retal (via anal)", "outra": "Outra"
   },
+  "otherPlaceholder": "Qual? Escreve aqui.",
   "notif": {
     "title": "Respostas aos teus posts",
     "empty": "Sem novidades. Quando alguém responder aos teus posts, aparece aqui.",

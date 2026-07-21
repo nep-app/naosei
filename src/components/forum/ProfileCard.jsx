@@ -39,30 +39,34 @@ export function ProfileCard({ uid, alias, onClose, onStartDM }) {
         <div className="text-gray-400 text-sm">{t('common.loading')}</div>
       ) : (
         <div className="space-y-3">
-          {profile?.reason && (
-            <div className="inline-flex items-center gap-1.5 text-sm px-3 py-1 rounded-full bg-purple-500/20 text-purple-300">
-              <Icons.Heart className="w-3.5 h-3.5" /> {t(`reasons.${profile.reason}`)}
+          {(profile?.reasons?.length > 0 || profile?.reason) && (
+            <div className="flex flex-wrap gap-1.5">
+              {(profile.reasons || [profile.reason]).map((r) => (
+                <span key={r} className="inline-flex items-center gap-1.5 text-xs px-3 py-1 rounded-full bg-purple-500/20 text-purple-300">
+                  <Icons.Heart className="w-3 h-3" /> {t(`reasons.${r}`, r)}
+                </span>
+              ))}
             </div>
           )}
           <p className="text-sm text-gray-200">
             {profile?.bio ? profile.bio : <span className="text-gray-500 italic">{t('profile.noBio')}</span>}
           </p>
-          {profile?.doc?.length > 0 && (
+          {(profile?.doc?.length > 0 || profile?.docOther) && (
             <div>
               <div className="text-xs text-gray-400 mb-1">{t('doc.label')}</div>
               <div className="flex flex-wrap gap-1.5">
-                {profile.doc.map((k) => (
-                  <span key={k} className="text-xs px-2 py-0.5 rounded-full bg-gray-700 text-gray-200">{t(`doc.${k}`, k)}</span>
+                {(profile.doc || []).map((k) => (
+                  <span key={k} className="text-xs px-2 py-0.5 rounded-full bg-gray-700 text-gray-200">{k === 'outra' && profile.docOther ? profile.docOther : t(`doc.${k}`, k)}</span>
                 ))}
               </div>
             </div>
           )}
-          {profile?.roa?.length > 0 && (
+          {(profile?.roa?.length > 0 || profile?.roaOther) && (
             <div>
               <div className="text-xs text-gray-400 mb-1">{t('roa.label')}</div>
               <div className="flex flex-wrap gap-1.5">
-                {profile.roa.map((k) => (
-                  <span key={k} className="text-xs px-2 py-0.5 rounded-full bg-gray-700 text-gray-200">{t(`roa.${k}`, k)}</span>
+                {(profile.roa || []).map((k) => (
+                  <span key={k} className="text-xs px-2 py-0.5 rounded-full bg-gray-700 text-gray-200">{k === 'outra' && profile.roaOther ? profile.roaOther : t(`roa.${k}`, k)}</span>
                 ))}
               </div>
             </div>

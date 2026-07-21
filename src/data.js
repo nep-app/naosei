@@ -38,15 +38,17 @@ export async function getProfile(uid) {
   const snap = await getDoc(doc(db, 'naosei_profiles', uid));
   return snap.exists() ? snap.data() : null;
 }
-export function saveProfile(uid, { alias, bio, reason, doc: docList, roa }) {
+export function saveProfile(uid, { alias, bio, reasons, doc: docList, docOther, roa, roaOther }) {
   return setDoc(
     doc(db, 'naosei_profiles', uid),
     {
       alias,
       bio: (bio || '').slice(0, 300),
-      reason: reason || '',
-      doc: Array.isArray(docList) ? docList.slice(0, 20) : [],
+      reasons: Array.isArray(reasons) ? reasons.slice(0, 10) : [],
+      doc: Array.isArray(docList) ? docList.slice(0, 30) : [],
+      docOther: (docOther || '').slice(0, 40),
       roa: Array.isArray(roa) ? roa.slice(0, 20) : [],
+      roaOther: (roaOther || '').slice(0, 40),
     },
     { merge: true }
   );
